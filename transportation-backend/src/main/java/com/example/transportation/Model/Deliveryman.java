@@ -11,8 +11,17 @@ public class Deliveryman {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
     private String fio;
     private String phone;
     private String vehicle;
 
+    public Deliveryman(String fio, String phone, String vehicle) {
+        this.fio = fio;
+        this.phone = phone;
+        this.vehicle = vehicle;
+    }
+
+    public Deliveryman() {
+    }
 }
