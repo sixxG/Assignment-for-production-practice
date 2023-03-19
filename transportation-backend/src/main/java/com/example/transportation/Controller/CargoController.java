@@ -1,13 +1,11 @@
 package com.example.transportation.Controller;
 
 import com.example.transportation.Model.Cargo;
+import com.example.transportation.Model.Deliveryman;
 import com.example.transportation.Model.Order;
 import com.example.transportation.repository.CargoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,6 +21,23 @@ public class CargoController {
     public List<Cargo> getAllCargo() {
 
         return cargoRepository.findAll();
+    }
+
+    @PostMapping("/save")
+    public String saveDeliveryman(@RequestBody Cargo cargo) {
+
+        long id = cargoRepository.save(cargo).getId();
+
+        return String.valueOf(id);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public boolean deleteDeliveryman(@PathVariable(value = "id") long id) {
+
+        cargoRepository.deleteById(id);
+        boolean deleteCargo = cargoRepository.findById(id) == null;
+
+        return deleteCargo;
     }
 
 }

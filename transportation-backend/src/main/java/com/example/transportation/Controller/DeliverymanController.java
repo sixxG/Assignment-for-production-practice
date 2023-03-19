@@ -38,12 +38,12 @@ public class DeliverymanController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public String deleteDeliveryman(@PathVariable(value = "id") long id) {
+    public boolean deleteDeliveryman(@PathVariable(value = "id") long id) {
 
         deliverymanRepository.deleteById(id);
         boolean deleteDeliveryman = deliverymanRepository.findById(id) == null;
 
-        return "deleted " + deleteDeliveryman;
+        return deleteDeliveryman;
     }
 
 }
