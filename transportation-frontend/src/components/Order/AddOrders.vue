@@ -82,7 +82,6 @@
                             </tr>
                         </tbody>
                     </table>
-                    {{ cargos }}
                 </div>
             </div>
 

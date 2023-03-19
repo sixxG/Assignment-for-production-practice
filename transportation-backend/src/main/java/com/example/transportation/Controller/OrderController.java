@@ -30,7 +30,6 @@ public class OrderController {
 
     @GetMapping("/getAllOrders")
     public List<Order> getAllOrder() {
-
         return orderRepository.findAll();
     }
 
@@ -54,6 +53,15 @@ public class OrderController {
         long id = orderRepository.save(order).getId();
 
         return String.valueOf(id);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public boolean deleteOrder(@PathVariable(value = "id") long id) {
+
+        orderRepository.deleteById(id);
+        boolean deleteOrder = orderRepository.findById(id) == null;
+
+        return deleteOrder;
     }
 
 }

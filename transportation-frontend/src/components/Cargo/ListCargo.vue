@@ -2,7 +2,7 @@
 
     <div style="width: 70%; justify-content: center; margin: 0 auto; margin-top: 5%;">
     
-      <button v-on:click="getAllCargo()" type="button" class="btn btn-dark">Get All Cargos</button>
+      <button v-on:click="getAllCargo()" type="button" class="btn btn-dark mr-2">Get All Cargos</button>
       <button v-on:click="cargos = []" type="button" class="btn btn-danger">Hide</button>
     
       <div class="alert alert-success" role="alert"

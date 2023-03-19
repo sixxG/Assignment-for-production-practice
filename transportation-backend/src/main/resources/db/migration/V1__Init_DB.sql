@@ -31,13 +31,14 @@ create table orderTB_cargo (
     primary key (orderTB_id, cargo_id)
 );
 
-alter table orderTB
-    add constraint FK48p0yr61a8tjvn8ol3sq54uin
-    foreign key (deliveryman_id)
-    references deliveryman (id);
 
 alter table orderTB_cargo
     add constraint FK23g9y55s151x74mo3nnidfuqg
     foreign key (cargo_id)
-    references cargo (id);
+    references cargo (id)
+    on delete cascade;
 
+alter table orderTB
+    add constraint FK48p0yr61a8tjvn8ol3sq54uin
+    foreign key (deliveryman_id)
+    references deliveryman (id);
