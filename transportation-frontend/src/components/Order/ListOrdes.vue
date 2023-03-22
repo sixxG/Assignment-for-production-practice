@@ -12,6 +12,46 @@
         <p class="mb-0">Это сообщение автоматически пропадёт через 5 секунд.</p>
       </div>
 
+      <div class="form-row">
+        <div class="col-md-4 mb-3">
+          <label for="validationServer01">Статус заказа</label>
+          <select v-model="orderStatus" class="form-control">
+            <option selected>All</option>
+            <option>CREATED</option>
+            <option>COMPLETING</option>
+            <option>READY_TO_SHIP</option>
+            <option>SHIPPED</option>
+            <option>DELIVERED</option>
+          </select>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label for="validationServer02">Кол-во элементов</label>
+          <br>
+          <div class="custom-control custom-radio custom-control-inline">
+            <input v-on:click="countItem = 2; page = 1" type="radio" id="customRadioInline1" name="customRadioInline1" class="custom-control-input">
+            <label class="custom-control-label" for="customRadioInline1">2</label>
+          </div>
+          <div class="custom-control custom-radio custom-control-inline">
+            <input v-on:click="countItem = 5; page = 1"  type="radio" id="customRadioInline2" name="customRadioInline1" class="custom-control-input" checked>
+            <label class="custom-control-label" for="customRadioInline2">5</label>
+          </div>
+          <div class="custom-control custom-radio custom-control-inline">
+            <input v-on:click="countItem = 15; page = 1" type="radio" id="customRadioInline3" name="customRadioInline1" class="custom-control-input">
+            <label class="custom-control-label" for="customRadioInline3">15</label>
+          </div>
+          <div class="custom-control custom-radio custom-control-inline">
+            <input v-on:click="countItem = 20; page = 1"  type="radio" id="customRadioInline4" name="customRadioInline1" class="custom-control-input">
+            <label class="custom-control-label" for="customRadioInline4">20</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="col-md-4 mb-3">
+          <button v-for="x in countPage" v-bind:key="x" v-on:click="page = x">{{ x }}</button>
+        </div>
+      </div>
+
       <table class="table table-striped">
       <thead>
         <tr>
@@ -27,7 +67,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="order in orders" v-bind:key="order.id">
+        <tr v-for="order in filteredOrders()" v-bind:key="order.id">
           <th scope="row">{{ order.id }}</th>
           <td>{{ order.number }}</td>
           <td>{{ order.fromLocation }}</td>
@@ -69,19 +109,40 @@
     
       data() {
         return {
+          orderStatus: null,
+          countItem: 5,
+          countPage: 1,
+          page: 1,
           orders: [],
           isDeleted: false
         }
       },
     
       methods: {
+
+        filteredOrders() {
+          this.countPage = Math.round(this.orders.length / this.countItem);
+
+          const start = (this.page - 1) * this.countItem;
+          const end = this.page * this.countItem;
+
+          if (this.orderStatus && this.orderStatus != "All") {
+            const length = this.orders.filter(order => order.status.includes(this.orderStatus)).length; 
+            this.countPage = Math.round(length / this.countItem);
+            console.log("Count page: " + this.countPage);
+
+            return this.orders.slice(start, end);
+          }
+          else {
+            return this.orders.slice(start, end);
+          }
+        },
     
         getAllOrders() {
-          axios
+            axios
             .get('http://localhost:8075/api/v1/order/getAllOrders')
             .then((response) => {
-              this.orders = response.data;
-              console.log(this.orders);
+                this.orders = response.data;
             })
         },
 
@@ -101,8 +162,11 @@
           console.log(id);
         }
     
+      },
+
+      created() {
+        this.getAllOrders();
       }
-    
     }
     </script>
     

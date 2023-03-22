@@ -77,7 +77,7 @@ export default {
             this.cargos=response.data
         },
 
-        saveOrder() {
+        async saveOrder() {
 
             if(this.name && this.price && this.count) {
                 const cargo = {
@@ -97,6 +97,8 @@ export default {
                 .catch(error => {
                     console.error(error);
                 });
+
+                await this.getAllCargo();
 
                 setTimeout(() => {
                     this.idCreated = null;

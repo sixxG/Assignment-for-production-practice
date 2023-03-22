@@ -145,10 +145,10 @@
                     })
             },
 
-            async getAllCargo() {
+            async getAllOrders() {
                 const response=await axios
-                .get('http://localhost:8075/api/v1/cargo/getAllCargos')
-              this.cargosListAll=response.data
+                .get('http://localhost:8075/api/v1/order/getAllOrders')
+                this.orders=response.data
             },
 
             async onCargoAdded(idCreated) {
@@ -169,7 +169,7 @@
                 this.cargos = filteredArrId.join(" ");
             },
 
-            saveOrder() {
+            async saveOrder() {
     
                 if(this.number && this.fromLocation && this.toLocation
                     && this.cargos && this.deliveryman && this.note) {
@@ -192,6 +192,8 @@
                     .catch(error => {
                         console.error(error);
                     });
+
+                    await this.getAllOrders();
         
                     setTimeout(() => {
                         this.idCreated = null;
