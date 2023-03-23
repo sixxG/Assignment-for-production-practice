@@ -1,6 +1,6 @@
 <template>
 
-    <div style="width: 70%; justify-content: center; margin: 0 auto; margin-top: 5%;">
+    <div style="width: 85%; justify-content: center; margin: 0 auto; margin-top: 5%;">
     
       <button v-on:click="getAllOrders()" type="button" class="btn btn-dark mr-2">Get All Orders</button>
       <button v-on:click="orders = []" type="button" class="btn btn-danger">Hide</button>
@@ -15,7 +15,7 @@
       <div class="form-row">
         <div class="col-md-4 mb-3">
           <label for="validationServer01">Статус заказа</label>
-          <select v-model="orderStatus" class="form-control">
+          <select v-model="orderStatus" class="form-control" v-on:change="page = 1">
             <option selected>All</option>
             <option>CREATED</option>
             <option>COMPLETING</option>
@@ -48,21 +48,78 @@
 
       <div class="form-row">
         <div class="col-md-4 mb-3">
-          <button v-for="x in countPage" v-bind:key="x" v-on:click="page = x">{{ x }}</button>
+          <button v-for="x in countPage" v-bind:key="x" v-on:click="page = x" 
+            :class="{'page_selected': x === page}" class="btn btn-info mr-2">{{ x }}</button>
         </div>
       </div>
 
       <table class="table table-striped">
       <thead>
         <tr>
-          <th scope="col">#</th>
-          <th scope="col">Number</th>
-          <th scope="col">From Location</th>
-          <th scope="col">To Location</th>
-          <th scope="col">Status</th>
-          <th scope="col">Cargos</th>
-          <th scope="col">Delivery man</th>
-          <th scope="col">Note</th>
+          <th scope="col">
+            <p class="sorted-icon" v-on:click="sortById()">
+              #
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-up ml-2" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M11.5 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L11 2.707V14.5a.5.5 0 0 0 .5.5zm-7-14a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L4 13.293V1.5a.5.5 0 0 1 .5-.5z"/>
+              </svg>
+            </p>
+          </th>
+          <th scope="col">
+            <p class="sorted-icon" v-on:click="sortByNumber()">
+              Number
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-up ml-2" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M11.5 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L11 2.707V14.5a.5.5 0 0 0 .5.5zm-7-14a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L4 13.293V1.5a.5.5 0 0 1 .5-.5z"/>
+              </svg>
+            </p>
+          </th>
+          <th scope="col">
+            <p class="sorted-icon" v-on:click="sortByFromLocation()">
+              From Location
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-up ml-2" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M11.5 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L11 2.707V14.5a.5.5 0 0 0 .5.5zm-7-14a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L4 13.293V1.5a.5.5 0 0 1 .5-.5z"/>
+              </svg>
+            </p>
+          </th>
+          <th scope="col">
+            <p class="sorted-icon" v-on:click="sortByToLocation()">
+              To Location
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-up ml-2" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M11.5 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L11 2.707V14.5a.5.5 0 0 0 .5.5zm-7-14a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L4 13.293V1.5a.5.5 0 0 1 .5-.5z"/>
+              </svg>
+            </p>
+          </th>
+          <th scope="col">
+            <p class="sorted-icon" v-on:click="sortByStatus()">
+              Status
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-up ml-2" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M11.5 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L11 2.707V14.5a.5.5 0 0 0 .5.5zm-7-14a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L4 13.293V1.5a.5.5 0 0 1 .5-.5z"/>
+              </svg>
+            </p>
+          </th>
+          <th scope="col">
+            <p class="sorted-icon" v-on:click="sortByCargos()">
+              Cargos
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-up ml-2" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M11.5 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L11 2.707V14.5a.5.5 0 0 0 .5.5zm-7-14a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L4 13.293V1.5a.5.5 0 0 1 .5-.5z"/>
+              </svg>
+            </p>
+          </th>
+          <th scope="col">
+            <p class="sorted-icon" v-on:click="sortByDeliveryMan()">
+              Delivery man
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-up ml-2" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M11.5 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L11 2.707V14.5a.5.5 0 0 0 .5.5zm-7-14a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L4 13.293V1.5a.5.5 0 0 1 .5-.5z"/>
+              </svg>
+            </p>
+          </th>
+          <th scope="col">
+            <p class="sorted-icon" v-on:click="sortByNote()">
+              Note
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-up ml-2" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M11.5 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L11 2.707V14.5a.5.5 0 0 0 .5.5zm-7-14a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L4 13.293V1.5a.5.5 0 0 1 .5-.5z"/>
+              </svg>
+            </p>
+          </th>
           <th></th>
         </tr>
       </thead>
@@ -114,6 +171,7 @@
           countPage: 1,
           page: 1,
           orders: [],
+          filteredOrdersList: [],
           isDeleted: false
         }
       },
@@ -127,11 +185,11 @@
           const end = this.page * this.countItem;
 
           if (this.orderStatus && this.orderStatus != "All") {
-            const length = this.orders.filter(order => order.status.includes(this.orderStatus)).length; 
+            this.filteredOrdersList = this.orders.filter(order => order.status === this.orderStatus);
+            const length = this.filteredOrdersList.length; 
             this.countPage = Math.round(length / this.countItem);
-            console.log("Count page: " + this.countPage);
 
-            return this.orders.slice(start, end);
+            return this.filteredOrdersList.slice(start, end);
           }
           else {
             return this.orders.slice(start, end);
@@ -160,7 +218,47 @@
               this.isDeleted = false;
           }, 5000);
           console.log(id);
-        }
+        },
+
+        sortById() {
+          this.orders.sort((a, b) => b.id - a.id);
+          this.filteredOrdersList.sort((a, b) => b.id - a.id);
+        },
+
+        sortByNumber() {
+          this.orders.sort((a, b) => a.number - b.number);
+          this.filteredOrdersList.sort((a, b) => a.number - b.number);
+        },
+
+        sortByFromLocation() {
+          this.orders.sort((a, b) => a.fromLocation.localeCompare(b.fromLocation));
+          this.filteredOrdersList.sort((a, b) => a.fromLocation.localeCompare(b.fromLocation));
+        },
+
+        sortByToLocation() {
+          this.orders.sort((a, b) => a.toLocation.localeCompare(b.toLocation));
+          this.filteredOrdersList.sort((a, b) => a.toLocation.localeCompare(b.toLocation));
+        },
+
+        sortByStatus() {
+          this.orders.sort((a, b) => a.status.localeCompare(b.status));
+          this.filteredOrdersList.sort((a, b) => a.status.localeCompare(b.status));
+        },
+
+        sortByCargos() {
+          this.orders.sort((a, b) => a.cargos.length - b.cargos.length);
+          this.filteredOrdersList.sort((a, b) => a.cargos.length - b.cargos.length);
+        },
+
+        sortByDeliveryMan() {
+          this.orders.sort((a, b) => a.deliveryman.fio.localeCompare(b.deliveryman.fio));
+          this.filteredOrdersList.sort((a, b) => a.deliveryman.fio.localeCompare(b.deliveryman.fio));
+        },
+
+        sortByNote() {
+          this.orders.sort((a, b) => a.note.localeCompare(b.note));
+          this.filteredOrdersList.sort((a, b) => a.note.localeCompare(b.note));
+        },
     
       },
 
@@ -172,6 +270,18 @@
     
     <!-- Add "scoped" attribute to limit CSS to this component only -->
     <style>
-    
+    .page_selected {
+      width: 80px;
+      box-shadow:
+       inset 0 -3em 3em rgba(0,0,0,0.1),
+             0 0  0 2px rgb(255,255,255),
+             0.3em 0.3em 1em rgba(0,0,0,0.3);
+    }
+
+    .sorted-icon {
+      display: flex; 
+      justify-content: center; 
+      align-items: center;
+    }
     </style>
     
