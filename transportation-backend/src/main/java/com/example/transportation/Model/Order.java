@@ -18,8 +18,7 @@ public class Order {
     private String fromLocation;
     private String toLocation;
 
-    @Enumerated(EnumType.STRING)
-    private OrderStatus status;
+    private String status;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

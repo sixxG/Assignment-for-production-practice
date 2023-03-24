@@ -145,10 +145,10 @@
                     })
             },
 
-            async getAllOrders() {
+            async getAllCargo() {
                 const response=await axios
-                .get('http://localhost:8075/api/v1/order/getAllOrders')
-                this.orders=response.data
+                .get('http://localhost:8075/api/v1/cargo/getAllCargos')
+                this.cargosListAll=response.data
             },
 
             async onCargoAdded(idCreated) {
@@ -192,8 +192,6 @@
                     .catch(error => {
                         console.error(error);
                     });
-
-                    await this.getAllOrders();
         
                     setTimeout(() => {
                         this.idCreated = null;

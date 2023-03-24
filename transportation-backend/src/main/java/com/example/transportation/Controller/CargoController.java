@@ -1,8 +1,6 @@
 package com.example.transportation.Controller;
 
 import com.example.transportation.Model.Cargo;
-import com.example.transportation.Model.Deliveryman;
-import com.example.transportation.Model.Order;
 import com.example.transportation.repository.CargoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -35,9 +33,8 @@ public class CargoController {
     public boolean deleteDeliveryman(@PathVariable(value = "id") long id) {
 
         cargoRepository.deleteById(id);
-        boolean deleteCargo = cargoRepository.findById(id) == null;
 
-        return deleteCargo;
+        return cargoRepository.findById(id) == null;
     }
 
 }

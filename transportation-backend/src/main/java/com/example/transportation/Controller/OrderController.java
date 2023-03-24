@@ -41,7 +41,7 @@ public class OrderController {
         order.setNumber(orderDTO.getNumber());
         order.setFromLocation(orderDTO.getFromLocation());
         order.setToLocation(orderDTO.getToLocation());
-        order.setStatus(OrderStatus.CREATED);
+        order.setStatus(OrderStatus.CREATED.toString());
         order.setDeliveryman(deliverymanRepository.findById(orderDTO.getDeliveryman()));
         order.setNote(orderDTO.getNote());
 
@@ -59,9 +59,8 @@ public class OrderController {
     public boolean deleteOrder(@PathVariable(value = "id") long id) {
 
         orderRepository.deleteById(id);
-        boolean deleteOrder = orderRepository.findById(id) == null;
 
-        return deleteOrder;
+        return orderRepository.findById(id) == null;
     }
 
 }

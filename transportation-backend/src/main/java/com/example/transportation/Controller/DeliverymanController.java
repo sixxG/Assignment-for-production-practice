@@ -41,9 +41,8 @@ public class DeliverymanController {
     public boolean deleteDeliveryman(@PathVariable(value = "id") long id) {
 
         deliverymanRepository.deleteById(id);
-        boolean deleteDeliveryman = deliverymanRepository.findById(id) == null;
 
-        return deleteDeliveryman;
+        return deliverymanRepository.findById(id) == null;
     }
 
 }

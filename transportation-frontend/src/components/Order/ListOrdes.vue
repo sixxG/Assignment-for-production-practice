@@ -3,7 +3,7 @@
     <div style="width: 85%; justify-content: center; margin: 0 auto; margin-top: 5%;">
     
       <button v-on:click="getAllOrders()" type="button" class="btn btn-dark mr-2">Get All Orders</button>
-      <button v-on:click="orders = []" type="button" class="btn btn-danger">Hide</button>
+      <button v-on:click="AllOrdersList = []" type="button" class="btn btn-danger">Hide</button>
     
       <div class="alert alert-success" role="alert"
         v-if="isDeleted">
@@ -14,18 +14,18 @@
 
       <div class="form-row">
         <div class="col-md-4 mb-3">
-          <label for="validationServer01">Статус заказа</label>
-          <select v-model="orderStatus" class="form-control" v-on:change="page = 1">
+          <label for="orderStatus">Статус заказа</label>
+          <select v-model="orderStatus" id="orderStatus" class="form-control" v-on:change="page = 1">
             <option selected>All</option>
-            <option>CREATED</option>
-            <option>COMPLETING</option>
-            <option>READY_TO_SHIP</option>
-            <option>SHIPPED</option>
-            <option>DELIVERED</option>
+            <option>Создан</option>
+            <option>Комплектуется</option>
+            <option>Готов к отправке</option>
+            <option>Отправлен</option>
+            <option>Доставлен</option>
           </select>
         </div>
-        <div class="col-md-4 mb-3">
-          <label for="validationServer02">Кол-во элементов</label>
+        <div class="col-md-3 mb-3">
+          <label style="margin-bottom: 15px;">Кол-во элементов</label>
           <br>
           <div class="custom-control custom-radio custom-control-inline">
             <input v-on:click="countItem = 2; page = 1" type="radio" id="customRadioInline1" name="customRadioInline1" class="custom-control-input">
@@ -42,6 +42,48 @@
           <div class="custom-control custom-radio custom-control-inline">
             <input v-on:click="countItem = 20; page = 1"  type="radio" id="customRadioInline4" name="customRadioInline1" class="custom-control-input">
             <label class="custom-control-label" for="customRadioInline4">20</label>
+          </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <button v-on:click="morePointForSearch = !morePointForSearch" type="button" class="btn btn-info" style="margin-top: 31px;">
+            Расширенный поиск
+          </button>
+        </div>
+      </div>
+
+      <div v-if="morePointForSearch">
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="fromLocation">From location</label>
+            <input type="text" v-model="fromLocation" class="form-control" id="fromLocation" placeholder="Москва">
+          </div>
+          <div class="form-group col-md-6">
+            <label for="toLocation">To Location</label>
+            <input type="text" v-model="toLocation" class="form-control" id="toLocation" placeholder="Владивосток">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="deliveryman">Deliveryman</label>
+            <input type="text" v-model="deliveryman" class="form-control" id="deliveryman" placeholder="Иванов Иван Иванович">
+          </div>
+          <div class="form-group col-md-6">
+            <label for="note">Note</label>
+            <input type="text" v-model="note" class="form-control" id="note" placeholder="Примечания">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-4">
+            <label for="cargo">Cargo</label>
+            <input type="text" v-model="cargo" class="form-control" id="cargo" placeholder="Стол, стул, или дверь">
+          </div>
+          <div class="form-group col-md-2">
+            <label for="number">Number</label>
+            <input type="text" v-model="number" class="form-control" id="number" placeholder="1234">
+          </div>
+          <div class="form-group col-md-2">
+            <button v-on:click="clearFormSearch()" class="btn btn-success form-control" id="search" style="margin-top: 31px;">Сбросить</button>
           </div>
         </div>
       </div>
@@ -170,37 +212,72 @@
           countItem: 5,
           countPage: 1,
           page: 1,
-          orders: [],
+          AllOrdersList: [],
           filteredOrdersList: [],
-          isDeleted: false
+          isDeleted: false,
+
+          morePointForSearch: false,
+          fromLocation: null,
+          toLocation: null,
+          deliveryman: null,
+          note: null,
+          cargo: null,
+          number: null,
         }
       },
     
       methods: {
 
         filteredOrders() {
-          this.countPage = Math.round(this.orders.length / this.countItem);
+          this.countPage = Math.round(this.AllOrdersList.length / this.countItem);
 
           const start = (this.page - 1) * this.countItem;
           const end = this.page * this.countItem;
 
+          this.filteredOrdersList = this.AllOrdersList;
+
           if (this.orderStatus && this.orderStatus != "All") {
-            this.filteredOrdersList = this.orders.filter(order => order.status === this.orderStatus);
+            this.filteredOrdersList = this.filteredOrdersList.filter(order => order.status === this.orderStatus);
             const length = this.filteredOrdersList.length; 
             this.countPage = Math.round(length / this.countItem);
+          }
+          if (this.fromLocation) {
+            this.filteredOrdersList = this.filteredOrdersList.filter(order => order.fromLocation.includes(this.fromLocation));
+          }
+          if (this.toLocation) {
+            this.filteredOrdersList = this.filteredOrdersList.filter(order => order.toLocation.includes(this.toLocation));
+          }
+          if (this.deliveryman) {
+            this.filteredOrdersList = this.filteredOrdersList.filter(order => order.deliveryman.fio.toString().includes(this.deliveryman));
+          }
+          if (this.cargo) {
+            this.filteredOrdersList = this.filteredOrdersList.filter(order =>
+              order.cargos.some(cargo => cargo.name.includes(this.cargo))
+            );
+          }
+          if (this.note) {
+            this.filteredOrdersList = this.filteredOrdersList.filter(order => order.note.includes(this.note));
+          }
+          if (this.number) {
+            this.filteredOrdersList = this.filteredOrdersList.filter(order => order.number.toString().includes(this.number.toString()));
+          }
+          return this.filteredOrdersList.slice(start, end);
+        },
 
-            return this.filteredOrdersList.slice(start, end);
-          }
-          else {
-            return this.orders.slice(start, end);
-          }
+        clearFormSearch() {
+          this.fromLocation = null,
+          this.toLocation = null,
+          this.deliveryman = null,
+          this.note = null,
+          this.cargo = null,
+          this.number = null
         },
     
         getAllOrders() {
             axios
             .get('http://localhost:8075/api/v1/order/getAllOrders')
             .then((response) => {
-                this.orders = response.data;
+                this.AllOrdersList = response.data;
             })
         },
 
@@ -221,42 +298,42 @@
         },
 
         sortById() {
-          this.orders.sort((a, b) => b.id - a.id);
+          this.AllOrdersList.sort((a, b) => b.id - a.id);
           this.filteredOrdersList.sort((a, b) => b.id - a.id);
         },
 
         sortByNumber() {
-          this.orders.sort((a, b) => a.number - b.number);
+          this.AllOrdersList.sort((a, b) => a.number - b.number);
           this.filteredOrdersList.sort((a, b) => a.number - b.number);
         },
 
         sortByFromLocation() {
-          this.orders.sort((a, b) => a.fromLocation.localeCompare(b.fromLocation));
+          this.AllOrdersList.sort((a, b) => a.fromLocation.localeCompare(b.fromLocation));
           this.filteredOrdersList.sort((a, b) => a.fromLocation.localeCompare(b.fromLocation));
         },
 
         sortByToLocation() {
-          this.orders.sort((a, b) => a.toLocation.localeCompare(b.toLocation));
+          this.AllOrdersList.sort((a, b) => a.toLocation.localeCompare(b.toLocation));
           this.filteredOrdersList.sort((a, b) => a.toLocation.localeCompare(b.toLocation));
         },
 
         sortByStatus() {
-          this.orders.sort((a, b) => a.status.localeCompare(b.status));
+          this.AllOrdersList.sort((a, b) => a.status.localeCompare(b.status));
           this.filteredOrdersList.sort((a, b) => a.status.localeCompare(b.status));
         },
 
         sortByCargos() {
-          this.orders.sort((a, b) => a.cargos.length - b.cargos.length);
+          this.AllOrdersList.sort((a, b) => a.cargos.length - b.cargos.length);
           this.filteredOrdersList.sort((a, b) => a.cargos.length - b.cargos.length);
         },
 
         sortByDeliveryMan() {
-          this.orders.sort((a, b) => a.deliveryman.fio.localeCompare(b.deliveryman.fio));
+          this.AllOrdersList.sort((a, b) => a.deliveryman.fio.localeCompare(b.deliveryman.fio));
           this.filteredOrdersList.sort((a, b) => a.deliveryman.fio.localeCompare(b.deliveryman.fio));
         },
 
         sortByNote() {
-          this.orders.sort((a, b) => a.note.localeCompare(b.note));
+          this.AllOrdersList.sort((a, b) => a.note.localeCompare(b.note));
           this.filteredOrdersList.sort((a, b) => a.note.localeCompare(b.note));
         },
     
