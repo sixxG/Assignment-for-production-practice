@@ -155,7 +155,7 @@ INSERT INTO ordertb_cargo (orderTB_id, cargo_id)
     VALUES (13, 4);
 
 INSERT INTO ordertb_cargo (orderTB_id, cargo_id)
-    VALUES (41, 1);
+    VALUES (14, 1);
 
 INSERT INTO ordertb_cargo (orderTB_id, cargo_id)
     VALUES (15, 4);

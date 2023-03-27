@@ -1,18 +1,17 @@
 package com.example.transportation.Controller;
 
-import com.example.transportation.DTO.OrderDTO;
+import com.example.transportation.DTO.OrderDTO_Create;
+import com.example.transportation.DTO.OrderDTO_Update;
 import com.example.transportation.Model.Cargo;
 import com.example.transportation.Model.Order;
 import com.example.transportation.Model.OrderStatus;
 import com.example.transportation.repository.CargoRepository;
 import com.example.transportation.repository.DeliverymanRepository;
 import com.example.transportation.repository.OrderRepository;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -35,8 +34,7 @@ public class OrderController {
     }
 
     @PostMapping("/save")
-    public String saveOrder(@RequestBody OrderDTO orderDTO) {
-
+    public String saveOrder(@RequestBody OrderDTO_Create orderDTO) {
         Order order = new Order();
 
         order.setNumber(orderDTO.getNumber());
@@ -58,7 +56,6 @@ public class OrderController {
 
     @DeleteMapping("/delete/{id}")
     public boolean deleteOrder(@PathVariable(value = "id") long id) {
-
         orderRepository.deleteById(id);
 
         return orderRepository.findById(id) != null;
@@ -73,6 +70,17 @@ public class OrderController {
         orderRepository.save(order);
 
         return orderRepository.findById(id) != null;
+    }
+
+    @PostMapping("/update")
+    public boolean updateOrder(@RequestBody OrderDTO_Update orderDTO) {
+        Order order = orderRepository.findById(orderDTO.getId());
+        order.setStatus(orderDTO.getStatus());
+        order.setNote(orderDTO.getNote());
+
+        orderRepository.save(order);
+
+        return orderRepository.findById(orderDTO.getId()) != null;
     }
 
 }

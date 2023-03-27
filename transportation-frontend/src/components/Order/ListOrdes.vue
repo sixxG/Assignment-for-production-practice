@@ -19,6 +19,13 @@
         <p class="mb-0">Это сообщение автоматически пропадёт через 5 секунд.</p>
       </div>
 
+      <div class="alert alert-success" role="alert"
+        v-if="isUpdate">
+        <p>Заказ был успешно обновлён</p>
+        <hr>
+        <p class="mb-0">Это сообщение автоматически пропадёт через 5 секунд.</p>
+      </div>
+
       <div class="form-row">
         <div class="col-md-4 mb-3">
           <label for="orderStatus">Статус заказа</label>
@@ -95,8 +102,8 @@
         </div>
       </div>
 
-      <div class="form-row">
-        <div class="col-md-4 mb-3">
+      <div class="form-row" style="width: 100%; display: block;">
+        <div class="col mb-3">
           <button v-for="x in countPage" v-bind:key="x" v-on:click="page = x" 
             :class="{'page_selected': x === page}" class="btn btn-info mr-2">{{ x }}</button>
         </div>
@@ -178,7 +185,12 @@
           <td>{{ order.number }}</td>
           <td>{{ order.fromLocation }}</td>
           <td>{{ order.toLocation }}</td>
-          <td>{{ order.status }}</td>
+          <td>
+            <select class="form-control" v-model="order.status" v-on:change="idUpdate = order.id">
+              <option selected>{{ order.status }}</option>
+              <option v-for="status in orderStatusWithoutSelected(order.status)" v-bind:key="status">{{ status }}</option>
+            </select>
+          </td>
           
           <td>
             <div v-for="cargo in order.cargos" v-bind:key="cargo.id">
@@ -191,7 +203,9 @@
           </td>
           
           <td>{{ order.deliveryman.fio }}</td>
-          <td>{{ order.note }}</td>
+          <td>
+            <textarea class="form-control" v-model="order.note" v-on:change="idUpdate = order.id"></textarea>
+          </td>
 
           <td>
             <button type="button" class="btn btn-danger" v-on:click="deleteOrder(order.id)" style="margin-bottom: 5px;">
@@ -199,14 +213,24 @@
                 <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z"/>
               </svg>
             </button>
-            <div v-if="order.status == 'Отправлен'">
-              <button type="button" v-on:click="completeOrder(order.id)" class="btn btn-success" data-toggle="tooltip" data-html="true" title="Завершить доставку">
+
+            <div v-if="order.status == 'Отправлен' && order.id !== idUpdate">
+              <button type="button" v-on:click="completeOrder(order.id)" class="btn btn-success" style="margin-bottom: 5px;" data-toggle="tooltip" data-html="true" title="Завершить доставку">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-clipboard2-check-fill" viewBox="0 0 16 16">
                   <path d="M10 .5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5.5.5 0 0 1-.5.5.5.5 0 0 0-.5.5V2a.5.5 0 0 0 .5.5h5A.5.5 0 0 0 11 2v-.5a.5.5 0 0 0-.5-.5.5.5 0 0 1-.5-.5Z"/>
                   <path d="M4.085 1H3.5A1.5 1.5 0 0 0 2 2.5v12A1.5 1.5 0 0 0 3.5 16h9a1.5 1.5 0 0 0 1.5-1.5v-12A1.5 1.5 0 0 0 12.5 1h-.585c.055.156.085.325.085.5V2a1.5 1.5 0 0 1-1.5 1.5h-5A1.5 1.5 0 0 1 4 2v-.5c0-.175.03-.344.085-.5Zm6.769 6.854-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708.708Z"/>
                 </svg>
               </button>
             </div>
+
+            <div v-if="idUpdate == order.id">
+              <button type="button" v-on:click="updateOrder()" class="btn btn-success" data-toggle="tooltip" data-html="true" title="Сохранить изменения">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-save" viewBox="0 0 16 16">
+                  <path d="M2 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H9.5a1 1 0 0 0-1 1v7.293l2.646-2.647a.5.5 0 0 1 .708.708l-3.5 3.5a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L7.5 9.293V2a2 2 0 0 1 2-2H14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h2.5a.5.5 0 0 1 0 1H2z"/>
+                </svg>
+              </button>
+            </div>
+
           </td>
         </tr>
       </tbody>
@@ -231,6 +255,7 @@
           filteredOrdersList: [],
           isDeleted: false,
           isCompleted: false,
+          isUpdate: false,
 
           morePointForSearch: false,
           fromLocation: null,
@@ -239,13 +264,14 @@
           note: null,
           cargo: null,
           number: null,
+          idUpdate: null,
         }
       },
     
       methods: {
 
         filteredOrders() {
-          this.countPage = Math.round(this.AllOrdersList.length / this.countItem);
+          this.countPage = Math.ceil(this.AllOrdersList.length / this.countItem);
 
           const start = (this.page - 1) * this.countItem;
           const end = this.page * this.countItem;
@@ -259,23 +285,35 @@
           }
           if (this.fromLocation) {
             this.filteredOrdersList = this.filteredOrdersList.filter(order => order.fromLocation.includes(this.fromLocation));
+            const length = this.filteredOrdersList.length; 
+            this.countPage = Math.round(length / this.countItem);
           }
           if (this.toLocation) {
             this.filteredOrdersList = this.filteredOrdersList.filter(order => order.toLocation.includes(this.toLocation));
+            const length = this.filteredOrdersList.length; 
+            this.countPage = Math.round(length / this.countItem);
           }
           if (this.deliveryman) {
             this.filteredOrdersList = this.filteredOrdersList.filter(order => order.deliveryman.fio.toString().includes(this.deliveryman));
+            const length = this.filteredOrdersList.length; 
+            this.countPage = Math.round(length / this.countItem);
           }
           if (this.cargo) {
             this.filteredOrdersList = this.filteredOrdersList.filter(order =>
               order.cargos.some(cargo => cargo.name.includes(this.cargo))
             );
+            const length = this.filteredOrdersList.length; 
+            this.countPage = Math.round(length / this.countItem);
           }
           if (this.note) {
             this.filteredOrdersList = this.filteredOrdersList.filter(order => order.note.includes(this.note));
+            const length = this.filteredOrdersList.length; 
+            this.countPage = Math.round(length / this.countItem);
           }
           if (this.number) {
             this.filteredOrdersList = this.filteredOrdersList.filter(order => order.number.toString().includes(this.number.toString()));
+            const length = this.filteredOrdersList.length; 
+            this.countPage = Math.round(length / this.countItem);
           }
           return this.filteredOrdersList.slice(start, end);
         },
@@ -328,6 +366,30 @@
           }, 5000);
         },
 
+        updateOrder() {
+          const order = this.AllOrdersList.filter(order => order.id === this.idUpdate);
+          const orderDTO = {
+                        id: order[0].id,
+                        status: order[0].status,
+                        note: order[0].note,
+                    };
+
+          axios.post('http://localhost:8075/api/v1/order/update', orderDTO)
+            .then(response => {
+                this.isUpdate = response.data;
+                this.getAllOrders();
+            })
+            .catch(error => {
+                console.error(error);
+            });
+
+          this.idUpdate = null;
+
+          setTimeout(() => {
+              this.isUpdate = false;
+          }, 5000);
+        },
+
         sortById() {
           this.AllOrdersList.sort((a, b) => b.id - a.id);
           this.filteredOrdersList.sort((a, b) => b.id - a.id);
@@ -367,6 +429,12 @@
           this.AllOrdersList.sort((a, b) => a.note.localeCompare(b.note));
           this.filteredOrdersList.sort((a, b) => a.note.localeCompare(b.note));
         },
+
+        orderStatusWithoutSelected(statusWithout) {
+            const statuses = ["Создан", "Комплектуется", "Готов к отправке", "Отправлен", "Доставлен"];
+
+            return statuses.filter(status => status !== statusWithout);
+        }
     
       },
 
