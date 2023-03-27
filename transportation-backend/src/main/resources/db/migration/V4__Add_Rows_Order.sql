@@ -48,6 +48,57 @@ INSERT INTO ordertb (id, from_location, note, number, status, to_location,
 VALUES (10, 'Екатеринбург', 'Проверить на целостность при получении', 1245,
         'Отправлен', 'Тюмень', 10);
 
+INSERT INTO ordertb (id, from_location, note, number, status, to_location,
+                     deliveryman_id)
+VALUES (11, 'Москва', 'Доставить до конца месяца', 12345,
+        'Отправлен', 'Санкт-Петербург', 1);
+
+INSERT INTO ordertb (id, from_location, note, number, status, to_location,
+                     deliveryman_id)
+    VALUES (12, 'Санкт-Петербург', 'Срочная доставка', 67890,
+            'Отправлен', 'Новосибирск', 2);
+
+INSERT INTO ordertb (id, from_location, note, number, status, to_location,
+                     deliveryman_id)
+    VALUES (13, 'Екатеринбург', 'Особый груз', 24680,
+            'Отправлен', 'Краснодар', 3);
+
+INSERT INTO ordertb (id, from_location, note, number, status, to_location,
+                     deliveryman_id)
+    VALUES (14, 'Новосибирск', 'Необходима срочная доставка', 13579,
+            'Отправлен', 'Москва', 4);
+
+INSERT INTO ordertb (id, from_location, note, number, status, to_location,
+                     deliveryman_id)
+    VALUES (15, 'Санкт-Петербург', 'Оплата при получении', 24680,
+            'Отправлен', 'Владивосток', 5);
+
+INSERT INTO ordertb (id, from_location, note, number, status, to_location,
+                     deliveryman_id)
+    VALUES (16, 'Краснодар', 'Доставить до конца недели', 35791,
+            'Отправлен', 'Санкт-Петербург', 6);
+
+INSERT INTO ordertb (id, from_location, note, number, status, to_location,
+                     deliveryman_id)
+    VALUES (17, 'Москва', 'Особые условия доставки', 46802,
+            'Отправлен', 'Красноярск', 7);
+
+INSERT INTO ordertb (id, from_location, note, number, status, to_location,
+                     deliveryman_id)
+    VALUES (18, 'Самара', 'Требуется страховка', 57913,
+            'Отправлен', 'Ростов-на-Дону', 8);
+
+INSERT INTO ordertb (id, from_location, note, number, status, to_location,
+                     deliveryman_id)
+    VALUES (19, 'Ростов-на-Дону', 'Необходимо доставить к определенной дате', 68024,
+            'Отправлен', 'Москва', 9);
+
+INSERT INTO ordertb (id, from_location, note, number, status, to_location,
+                     deliveryman_id)
+    VALUES (20, 'Санкт-Петербург', 'Доставить в течение 2 дней', 79135,
+            'Отправлен', 'Самара', 10);
+
+
 INSERT INTO ordertb_cargo (orderTB_id, cargo_id)
     VALUES (1, 1);
 INSERT INTO ordertb_cargo (orderTB_id, cargo_id)
@@ -93,3 +144,33 @@ INSERT INTO ordertb_cargo (orderTB_id, cargo_id)
     VALUES (10, 2);
 INSERT INTO ordertb_cargo (orderTB_id, cargo_id)
     VALUES (10, 10);
+
+INSERT INTO ordertb_cargo (orderTB_id, cargo_id)
+    VALUES (11, 3);
+
+INSERT INTO ordertb_cargo (orderTB_id, cargo_id)
+    VALUES (12, 2);
+
+INSERT INTO ordertb_cargo (orderTB_id, cargo_id)
+    VALUES (13, 4);
+
+INSERT INTO ordertb_cargo (orderTB_id, cargo_id)
+    VALUES (41, 1);
+
+INSERT INTO ordertb_cargo (orderTB_id, cargo_id)
+    VALUES (15, 4);
+
+INSERT INTO ordertb_cargo (orderTB_id, cargo_id)
+    VALUES (16, 2);
+
+INSERT INTO ordertb_cargo (orderTB_id, cargo_id)
+    VALUES (17, 3);
+
+INSERT INTO ordertb_cargo (orderTB_id, cargo_id)
+    VALUES (18, 1);
+
+INSERT INTO ordertb_cargo (orderTB_id, cargo_id)
+    VALUES (19, 1);
+
+INSERT INTO ordertb_cargo (orderTB_id, cargo_id)
+    VALUES (20, 3);

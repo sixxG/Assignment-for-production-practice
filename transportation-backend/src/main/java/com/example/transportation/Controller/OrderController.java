@@ -7,6 +7,7 @@ import com.example.transportation.Model.OrderStatus;
 import com.example.transportation.repository.CargoRepository;
 import com.example.transportation.repository.DeliverymanRepository;
 import com.example.transportation.repository.OrderRepository;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -60,7 +61,18 @@ public class OrderController {
 
         orderRepository.deleteById(id);
 
-        return orderRepository.findById(id) == null;
+        return orderRepository.findById(id) != null;
+    }
+
+    @PostMapping("/complete/{id}")
+    public boolean completeOrder(@PathVariable(value = "id") long id) {
+
+        Order order = orderRepository.findById(id);
+        order.setStatus(OrderStatus.DELIVERED.toString());
+
+        orderRepository.save(order);
+
+        return orderRepository.findById(id) != null;
     }
 
 }
