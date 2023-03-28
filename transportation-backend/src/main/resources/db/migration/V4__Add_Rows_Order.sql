@@ -98,6 +98,37 @@ INSERT INTO ordertb (id, from_location, note, number, status, to_location,
     VALUES (20, 'Санкт-Петербург', 'Доставить в течение 2 дней', 79135,
             'Отправлен', 'Самара', 10);
 
+INSERT INTO ordertb (id, from_location, note, number, status, to_location, deliveryman_id)
+VALUES (21, 'Москва', 'Доставить на следующий день', 73591, 'Отправлен', 'Казань', 5);
+
+INSERT INTO ordertb (id, from_location, note, number, status, to_location, deliveryman_id)
+VALUES (22, 'Санкт-Петербург', 'Уточнить адрес доставки', 64025, 'Отправлен', 'Екатеринбург', 8);
+
+INSERT INTO ordertb (id, from_location, note, number, status, to_location, deliveryman_id)
+VALUES (23, 'Краснодар', 'Оплатить наличными', 48529, 'Отправлен', 'Ростов-на-Дону', 3);
+
+INSERT INTO ordertb (id, from_location, note, number, status, to_location, deliveryman_id)
+VALUES (24, 'Новосибирск', 'Оставить у соседа', 91754, 'Отправлен', 'Омск', 7);
+
+INSERT INTO ordertb (id, from_location, note, number, status, to_location, deliveryman_id)
+VALUES (25, 'Самара', 'Доставить на 2-ом этаже', 14538, 'Отправлен', 'Уфа', 1);
+
+INSERT INTO ordertb (id, from_location, note, number, status, to_location, deliveryman_id)
+VALUES (26, 'Волгоград', 'Доставить до конца рабочего дня', 26374, 'Отправлен', 'Красноярск', 6);
+
+INSERT INTO ordertb (id, from_location, note, number, status, to_location, deliveryman_id)
+VALUES (27, 'Тюмень', 'Доставить по указанному адресу', 68025, 'Отправлен', 'Челябинск', 2);
+
+INSERT INTO ordertb (id, from_location, note, number, status, to_location, deliveryman_id)
+VALUES (28, 'Пермь', 'Доставить до 12:00', 49061, 'Отправлен', 'Томск', 9);
+
+INSERT INTO ordertb (id, from_location, note, number, status, to_location, deliveryman_id)
+VALUES (29, 'Рязань', 'Забрать у получателя', 81037, 'Отправлен', 'Саратов', 4);
+
+INSERT INTO ordertb (id, from_location, note, number, status, to_location, deliveryman_id)
+VALUES (30, 'Ульяновск', 'Оставить на почте', 57206, 'Отправлен', 'Нижний Новгород', 10);
+
+
 
 INSERT INTO ordertb_cargo (orderTB_id, cargo_id)
     VALUES (1, 1);
@@ -174,3 +205,51 @@ INSERT INTO ordertb_cargo (orderTB_id, cargo_id)
 
 INSERT INTO ordertb_cargo (orderTB_id, cargo_id)
     VALUES (20, 3);
+INSERT INTO ordertb_cargo (orderTB_id, cargo_id)
+    VALUES (20, 9);
+
+INSERT INTO ordertb_cargo (orderTB_id, cargo_id)
+    VALUES
+    -- orderTB_id = 21
+    (21, 6),
+    (21, 1),
+    -- orderTB_id = 22
+    (22, 8),
+    (22, 2),
+    (22, 7),
+    -- orderTB_id = 23
+    (23, 5),
+    (23, 1),
+    (23, 2),
+    (23, 9),
+    -- orderTB_id = 24
+    (24, 3),
+    (24, 8),
+    (24, 5),
+    -- orderTB_id = 25
+    (25, 2),
+    (25, 7),
+    -- orderTB_id = 26
+    (26, 1),
+    (26, 5),
+    (26, 9),
+    -- orderTB_id = 27
+    (27, 3),
+    (27, 4),
+    (27, 8),
+    (27, 2),
+    -- orderTB_id = 28
+    (28, 7),
+    (28, 1),
+    (28, 5),
+    (28, 9),
+    -- orderTB_id = 29
+    (29, 2),
+    (29, 8),
+    (29, 4),
+    -- orderTB_id = 30
+    (30, 6),
+    (30, 9),
+    (30, 1),
+    (30, 7),
+    (30, 4);

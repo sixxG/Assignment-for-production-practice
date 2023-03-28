@@ -58,7 +58,7 @@ public class OrderController {
     public boolean deleteOrder(@PathVariable(value = "id") long id) {
         orderRepository.deleteById(id);
 
-        return orderRepository.findById(id) != null;
+        return orderRepository.findById(id) == null;
     }
 
     @PostMapping("/complete/{id}")
