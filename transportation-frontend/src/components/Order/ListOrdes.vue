@@ -1,6 +1,6 @@
 <template>
 
-  <div style="width: 90%; justify-content: center; margin: 0 auto; margin-top: 5%;">
+  <div style="width: 90%; justify-content: center; margin: 0 auto;">
   
     <button v-on:click="getAllOrders()" type="button" class="btn btn-dark mr-2">Get All Orders</button>
     <button v-on:click="AllOrdersList = []" type="button" class="btn btn-danger">Hide</button>
@@ -284,7 +284,7 @@
             <option v-for="status in orderStatusWithoutSelected(order.status)" v-bind:key="status">{{ status }}</option>
           </select>
         </td>
-        
+
         <td>
           <div v-for="cargo in order.cargos" v-bind:key="cargo.id">
               {{ cargo.name }}<br>
@@ -317,7 +317,7 @@
           </div>
 
           <div v-if="idUpdate == order.id">
-            <button type="button" v-on:click="updateOrder()" class="btn btn-success" data-toggle="tooltip" data-html="true" title="Сохранить изменения">
+            <button type="button" v-on:click="updateOrder(order.id)" class="btn btn-success" data-toggle="tooltip" data-html="true" title="Сохранить изменения">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-save" viewBox="0 0 16 16">
                 <path d="M2 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H9.5a1 1 0 0 0-1 1v7.293l2.646-2.647a.5.5 0 0 1 .708.708l-3.5 3.5a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L7.5 9.293V2a2 2 0 0 1 2-2H14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h2.5a.5.5 0 0 1 0 1H2z"/>
               </svg>
@@ -474,7 +474,6 @@ export default {
       setTimeout(() => {
           this.isDeleted = false;
       }, 5000);
-      console.log(id);
     },
 
     completeOrder(id) {
@@ -492,8 +491,8 @@ export default {
       }, 5000);
     },
 
-    updateOrder() {
-      const order = this.AllOrdersList.filter(order => order.id === this.idUpdate);
+    updateOrder(id) {
+      const order = this.AllOrdersList.filter(order => order.id === id);
       const orderDTO = {
                     id: order[0].id,
                     status: order[0].status,
@@ -633,7 +632,6 @@ export default {
 
   watch: {
     page() {
-      console.log(this.page);
       window.history.pushState(
         null,
         document.title, 

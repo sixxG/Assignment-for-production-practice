@@ -27,9 +27,9 @@
   <!-- Tab panes -->
   <div @scroll="handleScroll">
     <div v-if="isShowOrders">
-      <ListOrdes/>
-      <hr>
       <AddOrders/>
+      <hr>
+      <ListOrdes/>
     </div>
     <div v-if="isShowDeliverymans">
       <ListDeliveryman/>
