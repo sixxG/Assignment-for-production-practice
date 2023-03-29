@@ -33,6 +33,11 @@ public class OrderController {
         return orderRepository.findAll();
     }
 
+    @GetMapping("/getById/{id}")
+    public Order getById(@PathVariable(value = "id") long id) {
+        return orderRepository.findById(id);
+    }
+
     @PostMapping("/save")
     public String saveOrder(@RequestBody OrderDTO_Create orderDTO) {
         Order order = new Order();

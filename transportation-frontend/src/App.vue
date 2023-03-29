@@ -29,8 +29,11 @@
     <div v-if="isShowOrders">
       <AddOrders/>
       <hr>
-      <ListOrdes/>
+      <ListOrdes  @gotoOrderDetails="showOrderDetails"/>
     </div>
+
+    <DetailsOrder v-if="isShowOrderDetails" @backFromOrderDetails="backFromOrderDetails"></DetailsOrder>
+    
     <div v-if="isShowDeliverymans">
       <ListDeliveryman/>
       <hr>
@@ -56,6 +59,7 @@ import AddCargo from './components/Cargo/AddCargo.vue';
 
 import ListOrdes from './components/Order/ListOrdes.vue';
 import AddOrders from './components/Order/AddOrders.vue';
+import DetailsOrder from './components/Order/DetailsOrder.vue';
 
 import BackToTop from './components/BackToTop.vue';
 
@@ -68,14 +72,18 @@ export default {
     AddCargo,
     AddDeliveryman,
     AddOrders,
-    BackToTop
+    BackToTop,
+    DetailsOrder,
   },
   
   data() {
     return {
       isShowOrders: true,
       isShowDeliverymans: false,
-      isShowCargos: false
+      isShowCargos: false,
+
+      isShowOrderDetails: false,
+      idOrderForDetails: null,
     }
   },
 
@@ -84,19 +92,47 @@ export default {
     showOrders() {
       this.isShowCargos = false;
       this.isShowDeliverymans = false;
-      this.isShowOrders = true
+      this.isShowOrders = true;
+      this.isShowOrderDetails = false;
     },
 
     showDeliverymans() {
       this.isShowCargos = false;
       this.isShowDeliverymans = true;
-      this.isShowOrders = false
+      this.isShowOrders = false;
+      this.isShowOrderDetails = false;
     },
 
     showCargos() {
       this.isShowCargos = true;
       this.isShowDeliverymans = false;
+      this.isShowOrders = false;
+      this.isShowOrderDetails = false;
+    },
+
+    showOrderDetails(id) {
+      this.isShowOrderDetails = true;
+      this.idOrderForDetails = id;
+
+      window.history.pushState(
+        null,
+        document.title, 
+        `${window.location.pathname}?id=${this.idOrderForDetails}`);
+
+      this.isShowCargos = false;
+      this.isShowDeliverymans = false;
       this.isShowOrders = false
+    },
+
+    backFromOrderDetails(isBack) {
+      if (isBack) {
+        window.history.pushState(
+          null,
+          document.title, 
+          `${window.location.pathname}`);
+
+          this.showOrders()
+      }
     },
 
     handleScroll() {
@@ -106,7 +142,16 @@ export default {
         document.body.classList.remove('scroll-show');
       }
     }
+  },
 
+  created() {
+    const windowData = Object.fromEntries(
+      new URL(window.location).searchParams.entries()
+    );
+
+    if (windowData.id) {
+      this.showOrderDetails(windowData.id)
+    }
   }
 } 
 

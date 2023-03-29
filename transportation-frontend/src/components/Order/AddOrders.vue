@@ -186,8 +186,6 @@ export default {
                     note: this.note,
                 }
     
-                console.log(orderDTO);
-    
                 axios.post('http://localhost:8075/api/v1/order/save', orderDTO)
                 .then(response => {
                     this.idCreated = response.data;
