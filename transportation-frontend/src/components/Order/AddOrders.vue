@@ -4,13 +4,6 @@
 
     <button class="btn btn-success" v-on:click="isShowAddOrder = !isShowAddOrder">Создать заказ</button>
 
-    <div class="alert alert-success" role="alert"
-        v-if="idCreated != null">
-        <p>Новый заказ с ID: {{ idCreated }} был успешно добавлен</p>
-        <hr>
-        <p class="mb-0">Это сообщение автоматически пропадёт через 5 секунд.</p>
-    </div>
-
     <form v-if="isShowAddOrder" v-on:submit.prevent="saveOrder">
 
         <div class="form-row">
@@ -134,7 +127,6 @@ export default {
             cargosListToOrder: [],
             isShowAddCargo: false,
             isShowAddOrder: false,
-            idCreated: null,
         }
     },
 
@@ -188,15 +180,11 @@ export default {
     
                 axios.post('http://localhost:8075/api/v1/order/save', orderDTO)
                 .then(response => {
-                    this.idCreated = response.data;
+                    this.$emit('orderCreated', response.data);
                 })
                 .catch(error => {
                     console.error(error);
                 });
-    
-                setTimeout(() => {
-                    this.idCreated = null;
-                }, 5000);
     
                 this.number = null,
                 this.fromLocation = null,

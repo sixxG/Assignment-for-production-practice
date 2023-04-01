@@ -1,16 +1,19 @@
 <template>
 
   <div style="width: 90%; justify-content: center; margin: 0 auto;">
+    <AddOrders @orderCreated="onOrderCreated"/>
+    <hr>
   
-    <button v-on:click="getAllOrders()" type="button" class="btn btn-dark mr-2">Get All Orders</button>
+    <button v-on:click="getOrders(this.page)" type="button" class="btn btn-dark mr-2">Get All Orders</button>
     <button v-on:click="AllOrdersList = []" type="button" class="btn btn-danger">Hide</button>
   
     <!-- CRUD info message -->
     <div class="alert alert-success" role="alert"
-      v-if="isDeleted || isCompleted || isUpdate">
+      v-if="isDeleted || isCompleted || isUpdate || idCreated != null">
       <p v-if="isDeleted">Заказ был успешно удалён</p>
       <p v-if="isCompleted">Заказ был успешно завершён</p>
       <p v-if="isUpdate">Заказ был успешно обновлён</p>
+      <p v-if="idCreated != null">Новый заказ с ID: {{ idCreated }} был успешно добавлен</p>
       <hr>
       <p class="mb-0">Это сообщение автоматически пропадёт через 5 секунд.</p>
     </div>
@@ -108,9 +111,15 @@
 
     <!-- Pagination -->
     <div class="form-row" style="width: 100%; display: block;">
-      <div class="col mb-3">
+      <div class="col mb-3" v-if="orderStatus == null || orderStatus === 'All'">
         <button v-for="x in pages()" v-bind:key="x" 
-          v-on:click="page = x" 
+          v-on:click="getOrders(x)"
+          :class="{'page_selected': x == page}"
+          :disabled="x === '...'" class="btn btn-info mr-2">{{ x }}</button>
+      </div>
+      <div class="col mb-3" v-if="orderStatus != null && orderStatus !== 'All'">
+        <button v-for="x in pages()" v-bind:key="x" 
+          v-on:click="getOrdersByStatus(orderStatus, x)"
           :class="{'page_selected': x == page}"
           :disabled="x === '...'" class="btn btn-info mr-2">{{ x }}</button>
       </div>
@@ -273,7 +282,7 @@
 
     <!-- List orders -->
     <tbody>
-      <tr v-for="order in filteredOrders()" v-bind:key="order.id">
+      <tr v-for="order in AllOrdersList" v-bind:key="order.id">
         <th scope="row">{{ order.id }}</th>
         <td>{{ order.number }}</td>
         <td>{{ order.fromLocation }}</td>
@@ -334,6 +343,7 @@ import axios from "axios"
 import DeleteOrder from "./DeleteOrder.vue";
 import CompleteOrder from './CompleteOrder.vue';
 import UpdateOrder from './UpdateOrder.vue';
+import AddOrders from "./AddOrders.vue";
 
 export default {
   name: 'ListOrders',
@@ -341,6 +351,7 @@ export default {
     DeleteOrder,
     CompleteOrder,
     UpdateOrder,
+    AddOrders,
   },
 
   data() {
@@ -349,11 +360,15 @@ export default {
       countItem: 5,
       countPage: 1,
       page: 1,
+      // countOrders: null,
+
       AllOrdersList: [],
-      filteredOrdersList: [],
+      // filteredOrdersList: [],
+
       isDeleted: false,
       isCompleted: false,
       isUpdate: false,
+      idCreated: null,
 
       morePointForSearch: false,
       fromLocation: null,
@@ -381,57 +396,60 @@ export default {
       this.$emit('gotoOrderDetails', id);
     },
 
-    filteredOrders() {
-      this.countPage = Math.ceil(this.AllOrdersList.length / this.countItem);
+    // filteredOrders() {
+    //   this.countPage = Math.ceil(this.countOrders / this.countItem);
 
-      const start = (this.page - 1) * this.countItem;
-      const end = this.page * this.countItem;
+    //   // const start = (this.page - 1) * this.countItem;
+    //   // const end = this.page * this.countItem;
+      
+    //   // this.getAllOrders(this.page);
 
-      this.filteredOrdersList = this.AllOrdersList;
+    //   this.filteredOrdersList = this.AllOrdersList;
 
-      if (this.orderStatus && this.orderStatus != "All") {
-        this.filteredOrdersList = this.filteredOrdersList.filter(order => order.status === this.orderStatus);
-        const length = this.filteredOrdersList.length; 
-        this.countPage = Math.round(length / this.countItem);
-      }
-      if (this.fromLocation) {
-        this.filteredOrdersList = this.filteredOrdersList.filter(order => order.fromLocation.includes(this.fromLocation));
-        const length = this.filteredOrdersList.length; 
-        this.countPage = Math.round(length / this.countItem);
-      }
-      if (this.toLocation) {
-        this.filteredOrdersList = this.filteredOrdersList.filter(order => order.toLocation.includes(this.toLocation));
-        const length = this.filteredOrdersList.length; 
-        this.countPage = Math.round(length / this.countItem);
-      }
-      if (this.deliveryman) {
-        this.filteredOrdersList = this.filteredOrdersList.filter(order => order.deliveryman.fio.toString().includes(this.deliveryman));
-        const length = this.filteredOrdersList.length; 
-        this.countPage = Math.round(length / this.countItem);
-      }
-      if (this.cargo) {
-        this.filteredOrdersList = this.filteredOrdersList.filter(order =>
-          order.cargos.some(cargo => cargo.name.includes(this.cargo))
-        );
-        const length = this.filteredOrdersList.length; 
-        this.countPage = Math.round(length / this.countItem);
-      }
-      if (this.note) {
-        this.filteredOrdersList = this.filteredOrdersList.filter(order => order.note.includes(this.note));
-        const length = this.filteredOrdersList.length; 
-        this.countPage = Math.round(length / this.countItem);
-      }
-      if (this.number) {
-        this.filteredOrdersList = this.filteredOrdersList.filter(order => order.number.toString().includes(this.number.toString()));
-        const length = this.filteredOrdersList.length; 
-        this.countPage = Math.round(length / this.countItem);
-      }
-      return this.filteredOrdersList.slice(start, end);
-    },
+    //   if (this.orderStatus && this.orderStatus != "All") {
+    //     const length = this.filteredOrdersList.length; 
+    //     this.countPage = Math.round(length / this.countItem);
+    //   }
+    //   if (this.fromLocation) {
+    //     this.filteredOrdersList = this.filteredOrdersList.filter(order => order.fromLocation.includes(this.fromLocation));
+    //     const length = this.filteredOrdersList.length; 
+    //     this.countPage = Math.round(length / this.countItem);
+    //   }
+    //   if (this.toLocation) {
+    //     this.filteredOrdersList = this.filteredOrdersList.filter(order => order.toLocation.includes(this.toLocation));
+    //     const length = this.filteredOrdersList.length; 
+    //     this.countPage = Math.round(length / this.countItem);
+    //   }
+    //   if (this.deliveryman) {
+    //     this.filteredOrdersList = this.filteredOrdersList.filter(order => order.deliveryman.fio.toString().includes(this.deliveryman));
+    //     const length = this.filteredOrdersList.length; 
+    //     this.countPage = Math.round(length / this.countItem);
+    //   }
+    //   if (this.cargo) {
+    //     this.filteredOrdersList = this.filteredOrdersList.filter(order =>
+    //       order.cargos.some(cargo => cargo.name.includes(this.cargo))
+    //     );
+    //     const length = this.filteredOrdersList.length; 
+    //     this.countPage = Math.round(length / this.countItem);
+    //   }
+    //   if (this.note) {
+    //     this.filteredOrdersList = this.filteredOrdersList.filter(order => order.note.includes(this.note));
+    //     const length = this.filteredOrdersList.length; 
+    //     this.countPage = Math.round(length / this.countItem);
+    //   }
+    //   if (this.number) {
+    //     this.filteredOrdersList = this.filteredOrdersList.filter(order => order.number.toString().includes(this.number.toString()));
+    //     const length = this.filteredOrdersList.length; 
+    //     this.countPage = Math.round(length / this.countItem);
+    //   }
+    //   return this.filteredOrdersList;
+    //   //.slice(start, end);
+    // },
 
     pages() {
       let left = Math.max(1, this.page - 2);
-      let right = Math.min(this.countPage, this.page + 2);
+      let right = Math.min(this.countPage, (Number(this.page) + 2));
+
       let pages = [];
 
       for (let i = left; i <= right; i++) {
@@ -460,16 +478,62 @@ export default {
       this.number = null
     },
 
-    getAllOrders() {
-        axios
-        .get('http://localhost:8075/api/v1/order/getAllOrders')
-        .then((response) => {
-            this.AllOrdersList = response.data;
-        })
+    getOrders(x) {
+      axios
+      .get('http://localhost:8075/api/v1/order/getAllOrders',  {
+        params: {
+          page: x,
+          countItems: this.countItem,
+        }
+      })
+      .then((response) => {
+          this.page = x;
+          this.AllOrdersList = response.data;
+          this.getCountOrders(this.orderStatus);
+      })
+    },
+
+    getCountOrders(status) {
+      axios
+      .get('http://localhost:8075/api/v1/order/getCountOrders',  {
+        params: {
+          status: status
+        }
+      })
+      .then((response) => {
+          this.countOrders = response.data;
+          this.countPage = Math.ceil(this.countOrders / this.countItem);
+      })
+    },
+    
+    getOrdersByStatus(status, x) {
+      axios
+      .get('http://localhost:8075/api/v1/order/getOrdersByStatus',  {
+        params: {
+          status: status,
+          page: x,
+          countItems: this.countItem,
+        }
+      })
+      .then((response) => {
+          this.page = x;
+          this.AllOrdersList = response.data;
+          this.getCountOrders(status);
+      })
+    },
+
+    onOrderCreated(id) {
+      this.getOrders(this.page);
+
+      this.idCreated = id;
+
+      setTimeout(() => {
+          this.idCreated = null;
+      }, 5000);
     },
 
     onOrderDeleted(isOrderDeleted) {
-      this.getAllOrders();
+      this.getOrders(this.page);
 
       this.isDeleted = isOrderDeleted;
 
@@ -479,7 +543,7 @@ export default {
     },
 
     onOrderCompleted(isOrderCompleted) {
-      this.getAllOrders();
+      this.getOrders(this.page);
 
       this.isCompleted = isOrderCompleted;
 
@@ -492,99 +556,100 @@ export default {
       this.idUpdate = null;
 
       this.isUpdate = isOrderUpdated;
+      this.getOrders(this.page);
 
       setTimeout(() => {
           this.isUpdate = false;
       }, 5000);
     },
 
-    sortById() {
-      if (this.ifSortById) {
-        this.AllOrdersList.sort((a, b) => b.id - a.id);
-        this.filteredOrdersList.sort((a, b) => b.id - a.id);
-      } else {
-        this.AllOrdersList.sort((a, b) => a.id - b.id);
-        this.filteredOrdersList.sort((a, b) => a.id - b.id);
-      }
-      this.page = 1;
-    },
+    // sortById() {
+    //   if (this.ifSortById) {
+    //     this.AllOrdersList.sort((a, b) => b.id - a.id);
+    //     this.filteredOrdersList.sort((a, b) => b.id - a.id);
+    //   } else {
+    //     this.AllOrdersList.sort((a, b) => a.id - b.id);
+    //     this.filteredOrdersList.sort((a, b) => a.id - b.id);
+    //   }
+    //   this.page = 1;
+    // },
 
-    sortByNumber() {
-      if (this.ifSortByNumber) {
-        this.AllOrdersList.sort((a, b) => a.number - b.number);
-        this.filteredOrdersList.sort((a, b) => a.number - b.number);
-      } else {
-        this.AllOrdersList.sort((a, b) => b.number - a.number);
-        this.filteredOrdersList.sort((a, b) => b.number - a.number);
-      }
-      this.page = 1;
-    },
+    // sortByNumber() {
+    //   if (this.ifSortByNumber) {
+    //     this.AllOrdersList.sort((a, b) => a.number - b.number);
+    //     this.filteredOrdersList.sort((a, b) => a.number - b.number);
+    //   } else {
+    //     this.AllOrdersList.sort((a, b) => b.number - a.number);
+    //     this.filteredOrdersList.sort((a, b) => b.number - a.number);
+    //   }
+    //   this.page = 1;
+    // },
 
-    sortByFromLocation() {
-      if (this.ifSortByFromLocation) {
-        this.AllOrdersList.sort((a, b) => a.fromLocation.localeCompare(b.fromLocation));
-        this.filteredOrdersList.sort((a, b) => a.fromLocation.localeCompare(b.fromLocation));
-      } else {
-        this.AllOrdersList.sort((a, b) => b.fromLocation.localeCompare(a.fromLocation));
-        this.filteredOrdersList.sort((a, b) => b.fromLocation.localeCompare(a.fromLocation));
-      }
-      this.page = 1;
-    },
+    // sortByFromLocation() {
+    //   if (this.ifSortByFromLocation) {
+    //     this.AllOrdersList.sort((a, b) => a.fromLocation.localeCompare(b.fromLocation));
+    //     this.filteredOrdersList.sort((a, b) => a.fromLocation.localeCompare(b.fromLocation));
+    //   } else {
+    //     this.AllOrdersList.sort((a, b) => b.fromLocation.localeCompare(a.fromLocation));
+    //     this.filteredOrdersList.sort((a, b) => b.fromLocation.localeCompare(a.fromLocation));
+    //   }
+    //   this.page = 1;
+    // },
 
-    sortByToLocation() {
-      if (this.ifSortByToLocation) {
-        this.AllOrdersList.sort((a, b) => a.toLocation.localeCompare(b.toLocation));
-        this.filteredOrdersList.sort((a, b) => a.toLocation.localeCompare(b.toLocation));
-      } else {
-        this.AllOrdersList.sort((a, b) => b.toLocation.localeCompare(a.toLocation));
-        this.filteredOrdersList.sort((a, b) => b.toLocation.localeCompare(a.toLocation));
-      }
-      this.page = 1;
-    },
+    // sortByToLocation() {
+    //   if (this.ifSortByToLocation) {
+    //     this.AllOrdersList.sort((a, b) => a.toLocation.localeCompare(b.toLocation));
+    //     this.filteredOrdersList.sort((a, b) => a.toLocation.localeCompare(b.toLocation));
+    //   } else {
+    //     this.AllOrdersList.sort((a, b) => b.toLocation.localeCompare(a.toLocation));
+    //     this.filteredOrdersList.sort((a, b) => b.toLocation.localeCompare(a.toLocation));
+    //   }
+    //   this.page = 1;
+    // },
 
-    sortByStatus() {
-      if (this.ifSortByStatus) { 
-        this.AllOrdersList.sort((a, b) => a.status.localeCompare(b.status));
-        this.filteredOrdersList.sort((a, b) => a.status.localeCompare(b.status)); 
-      } else {
-        this.AllOrdersList.sort((a, b) => b.status.localeCompare(a.status));
-        this.filteredOrdersList.sort((a, b) => b.status.localeCompare(a.status));
-      }
-      this.page = 1;
-    },
+    // sortByStatus() {
+    //   if (this.ifSortByStatus) { 
+    //     this.AllOrdersList.sort((a, b) => a.status.localeCompare(b.status));
+    //     this.filteredOrdersList.sort((a, b) => a.status.localeCompare(b.status)); 
+    //   } else {
+    //     this.AllOrdersList.sort((a, b) => b.status.localeCompare(a.status));
+    //     this.filteredOrdersList.sort((a, b) => b.status.localeCompare(a.status));
+    //   }
+    //   this.page = 1;
+    // },
 
-    sortByCargos() {
-      if (this.ifSortByCargos) { 
-        this.AllOrdersList.sort((a, b) => a.cargos.length - b.cargos.length);
-        this.filteredOrdersList.sort((a, b) => a.cargos.length - b.cargos.length);
-      } else {
-        this.AllOrdersList.sort((a, b) => b.cargos.length - a.cargos.length);
-        this.filteredOrdersList.sort((a, b) => b.cargos.length - a.cargos.length);
-      }
-      this.page = 1;
-    },
+    // sortByCargos() {
+    //   if (this.ifSortByCargos) { 
+    //     this.AllOrdersList.sort((a, b) => a.cargos.length - b.cargos.length);
+    //     this.filteredOrdersList.sort((a, b) => a.cargos.length - b.cargos.length);
+    //   } else {
+    //     this.AllOrdersList.sort((a, b) => b.cargos.length - a.cargos.length);
+    //     this.filteredOrdersList.sort((a, b) => b.cargos.length - a.cargos.length);
+    //   }
+    //   this.page = 1;
+    // },
 
-    sortByDeliveryMan() {
-      if (this.ifSortByDeliveryMan) { 
-        this.AllOrdersList.sort((a, b) => a.deliveryman.fio.localeCompare(b.deliveryman.fio));
-        this.filteredOrdersList.sort((a, b) => a.deliveryman.fio.localeCompare(b.deliveryman.fio));
-      } else {
-        this.AllOrdersList.sort((a, b) => b.deliveryman.fio.localeCompare(a.deliveryman.fio));
-        this.filteredOrdersList.sort((a, b) => b.deliveryman.fio.localeCompare(a.deliveryman.fio));
-      }
-      this.page = 1;
-    },
+    // sortByDeliveryMan() {
+    //   if (this.ifSortByDeliveryMan) { 
+    //     this.AllOrdersList.sort((a, b) => a.deliveryman.fio.localeCompare(b.deliveryman.fio));
+    //     this.filteredOrdersList.sort((a, b) => a.deliveryman.fio.localeCompare(b.deliveryman.fio));
+    //   } else {
+    //     this.AllOrdersList.sort((a, b) => b.deliveryman.fio.localeCompare(a.deliveryman.fio));
+    //     this.filteredOrdersList.sort((a, b) => b.deliveryman.fio.localeCompare(a.deliveryman.fio));
+    //   }
+    //   this.page = 1;
+    // },
 
-    sortByNote() {
-      if (this.ifSortByNote) {  
-        this.AllOrdersList.sort((a, b) => a.note.localeCompare(b.note));
-        this.filteredOrdersList.sort((a, b) => a.note.localeCompare(b.note));
-      } else {
-        this.AllOrdersList.sort((a, b) => b.note.localeCompare(a.note));
-        this.filteredOrdersList.sort((a, b) => b.note.localeCompare(a.note));
-      }
-      this.page = 1;
-    },
+    // sortByNote() {
+    //   if (this.ifSortByNote) {  
+    //     this.AllOrdersList.sort((a, b) => a.note.localeCompare(b.note));
+    //     this.filteredOrdersList.sort((a, b) => a.note.localeCompare(b.note));
+    //   } else {
+    //     this.AllOrdersList.sort((a, b) => b.note.localeCompare(a.note));
+    //     this.filteredOrdersList.sort((a, b) => b.note.localeCompare(a.note));
+    //   }
+    //   this.page = 1;
+    // },
 
     orderStatusWithoutSelected(statusWithout) {
         const statuses = ["Создан", "Комплектуется", "Готов к отправке", "Отправлен", "Доставлен"];
@@ -602,70 +667,72 @@ export default {
       this.page = windowData.page;
     }
 
-    if (windowData.orderStatus) {
-      this.orderStatus = windowData.orderStatus;
+    this.orderStatus = localStorage.getItem('orderStatus');
+
+    if (localStorage.getItem('countItem') !== null) {
+      this.countItem = localStorage.getItem('countItem');
     }
 
-    if (windowData.countItem) {
-      this.countItem = windowData.countItem;
-    }
-
-    this.getAllOrders();
+    this.getOrders(this.page);
   },
 
-  watch: {
+   watch: {
     page() {
       window.history.pushState(
         null,
         document.title, 
-        `${window.location.pathname}?orderStatus=${this.orderStatus}&countItem=${this.countItem}&page=${this.page}`);
+        `${window.location.pathname}?page=${this.page}`);
     },
 
     orderStatus() {
-      window.history.pushState(
-        null,
-        document.title, 
-        `${window.location.pathname}?orderStatus=${this.orderStatus}&countItem=${this.countItem}&page=${this.page}`);
+      if (this.orderStatus === "All" || this.orderStatus === null) {
+        this.getOrders(this.page);
+      } else {
+        this.getOrdersByStatus(this.orderStatus, this.page)
+      }
+      localStorage.setItem('orderStatus', this.orderStatus);
     },
 
     countItem() {
-      window.history.pushState(
-        null,
-        document.title, 
-        `${window.location.pathname}?orderStatus=${this.orderStatus}&countItem=${this.countItem}&page=${this.page}`);
+      if (this.orderStatus === "All" || this.orderStatus === null) {
+        this.getOrders(1);
+      } else {
+        this.getOrdersByStatus(this.orderStatus, this.page)
+      }
+      localStorage.setItem('countItem', this.countItem);
     },
 
-    ifSortById() {
-      this.sortById();
-    },
+  //   ifSortById() {
+  //     this.sortById();
+  //   },
 
-    ifSortByNumber() {
-      this.sortByNumber();
-    },
+  //   ifSortByNumber() {
+  //     this.sortByNumber();
+  //   },
 
-    ifSortByFromLocation() {
-      this.sortByFromLocation();
-    },
+  //   ifSortByFromLocation() {
+  //     this.sortByFromLocation();
+  //   },
     
-    ifSortByToLocation() {
-      this.sortByToLocation();
-    },
+  //   ifSortByToLocation() {
+  //     this.sortByToLocation();
+  //   },
 
-    ifSortByStatus() {
-      this.sortByStatus();
-    },
+  //   ifSortByStatus() {
+  //     this.sortByStatus();
+  //   },
 
-    ifSortByCargos() {
-      this.sortByCargos();
-    },
+  //   ifSortByCargos() {
+  //     this.sortByCargos();
+  //   },
 
-    ifSortByDeliveryMan() {
-      this.sortByDeliveryMan();
-    },
+  //   ifSortByDeliveryMan() {
+  //     this.sortByDeliveryMan();
+  //   },
 
-    ifSortByNote() { 
-      this.sortByNote();
-    }
+  //   ifSortByNote() { 
+  //     this.sortByNote();
+  //   }
   }
 }
 </script>

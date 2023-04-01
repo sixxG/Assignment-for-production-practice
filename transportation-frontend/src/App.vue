@@ -27,8 +27,6 @@
   <!-- Tab panes -->
   <div @scroll="handleScroll">
     <div v-if="isShowOrders">
-      <AddOrders/>
-      <hr>
       <ListOrdes  @gotoOrderDetails="showOrderDetails"/>
     </div>
 
@@ -58,7 +56,6 @@ import ListCargo from './components/Cargo/ListCargo.vue';
 import AddCargo from './components/Cargo/AddCargo.vue';
 
 import ListOrdes from './components/Order/ListOrdes.vue';
-import AddOrders from './components/Order/AddOrders.vue';
 import DetailsOrder from './components/Order/DetailsOrder.vue';
 
 import BackToTop from './components/BackToTop.vue';
@@ -71,7 +68,6 @@ export default {
     ListCargo,
     AddCargo,
     AddDeliveryman,
-    AddOrders,
     BackToTop,
     DetailsOrder,
   },
