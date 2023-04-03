@@ -1,0 +1,861 @@
+{
+	"info": {
+		"_postman_id": "98b4425f-4e00-445a-ba54-b51c40780f78",
+		"name": "Transportation",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "DeliverymanAPI",
+			"item": [
+				{
+					"name": "Save deliveryman",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"fio\" : \"fio\",\r\n    \"phone\" : \"phone\",\r\n    \"vehicle\" : \"vehicle\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8075/api/v1/deliveryman/save",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8075",
+							"path": [
+								"api",
+								"v1",
+								"deliveryman",
+								"save"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Deliveryman",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8075/api/v1/deliveryman/getAllDeliveryman",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8075",
+							"path": [
+								"api",
+								"v1",
+								"deliveryman",
+								"getAllDeliveryman"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "countItems",
+									"value": "5",
+									"disabled": true
+								},
+								{
+									"key": "sortBy",
+									"value": "vehicle_down",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Deliveryman",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": 12,\r\n    \"fio\": \"fio\",\r\n    \"phone\": \"phone1\",\r\n    \"vehicle\": \"vehicle\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8075/api/v1/deliveryman/update",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8075",
+							"path": [
+								"api",
+								"v1",
+								"deliveryman",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Deliveryman",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8075/api/v1/deliveryman/delete/12",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8075",
+							"path": [
+								"api",
+								"v1",
+								"deliveryman",
+								"delete",
+								"12"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Deliverymans FIO",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8075/api/v1/deliveryman/getDeliverymansFIO",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8075",
+							"path": [
+								"api",
+								"v1",
+								"deliveryman",
+								"getDeliverymansFIO"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Deliverymans By FIO",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8075/api/v1/deliveryman/getDiliverymansByFIO",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8075",
+							"path": [
+								"api",
+								"v1",
+								"deliveryman",
+								"getDiliverymansByFIO"
+							],
+							"query": [
+								{
+									"key": "fio",
+									"value": "Иванов",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "countItems",
+									"value": "1",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Deliveryman",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8075/api/v1/deliveryman/searchDeliveryman?phone=7 9&vehicle",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8075",
+							"path": [
+								"api",
+								"v1",
+								"deliveryman",
+								"searchDeliveryman"
+							],
+							"query": [
+								{
+									"key": "phone",
+									"value": "7 9"
+								},
+								{
+									"key": "vehicle",
+									"value": null
+								},
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "OrderAPI",
+			"item": [
+				{
+					"name": "Get All Orders",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "text"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8075/api/v1/order/getAllOrders?page=2&countItems=5&sortBy=cargos_up",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8075",
+							"path": [
+								"api",
+								"v1",
+								"order",
+								"getAllOrders"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "2"
+								},
+								{
+									"key": "countItems",
+									"value": "5"
+								},
+								{
+									"key": "sortBy",
+									"value": "cargos_up"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Save order",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"number\" : 1,\r\n    \"fromLocation\": \"1\",\r\n    \"toLocation\": \"1\",\r\n    \"status\": \"CREATED\",\r\n    \"cargos\": [\r\n        {\r\n            \"id\": 8,\r\n            \"name\": \"Дверной замок\",\r\n            \"price\": 475.0,\r\n            \"count\": 225\r\n        }\r\n    ],\r\n    \"deliveryman\": {\r\n        \"id\": 1,\r\n        \"fio\": \"Иванов Иван Иванович\",\r\n        \"phone\": \"+7 800 555 35 35\",\r\n        \"vehicle\": \"Легковой автомобиль\",\r\n        \"hibernateLazyInitializer\": {}\r\n    },\r\n    \"note\": \"1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8075/api/v1/order/save",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8075",
+							"path": [
+								"api",
+								"v1",
+								"order",
+								"save"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Order",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8075/api/v1/order/delete/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8075",
+							"path": [
+								"api",
+								"v1",
+								"order",
+								"delete",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Complete Order",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8075/api/v1/order/complete/5",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8075",
+							"path": [
+								"api",
+								"v1",
+								"order",
+								"complete",
+								"5"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Order",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": 21,\r\n    \"status\": 2,\r\n    \"note\": 3\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8075/api/v1/order/update",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8075",
+							"path": [
+								"api",
+								"v1",
+								"order",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8075/api/v1/order/getById/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8075",
+							"path": [
+								"api",
+								"v1",
+								"order",
+								"getById",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get count orders",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8075/api/v1/order/getCountOrders?status=All",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8075",
+							"path": [
+								"api",
+								"v1",
+								"order",
+								"getCountOrders"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "All"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Orders by status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8075/api/v1/order/getOrdersByStatus?status=Создан&page=4&countItems=2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8075",
+							"path": [
+								"api",
+								"v1",
+								"order",
+								"getOrdersByStatus"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "Создан"
+								},
+								{
+									"key": "page",
+									"value": "4"
+								},
+								{
+									"key": "countItems",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Order",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8075/api/v1/order/searchOrder?fromLocation=Москва&page=1&countItems=2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8075",
+							"path": [
+								"api",
+								"v1",
+								"order",
+								"searchOrder"
+							],
+							"query": [
+								{
+									"key": "number",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "fromLocation",
+									"value": "Москва"
+								},
+								{
+									"key": "toLocation",
+									"value": null,
+									"disabled": true
+								},
+								{
+									"key": "status",
+									"value": "All",
+									"disabled": true
+								},
+								{
+									"key": "note",
+									"value": null,
+									"disabled": true
+								},
+								{
+									"key": "deliveryman",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "cargo",
+									"value": "стол",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "countItems",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "CargoAPI",
+			"item": [
+				{
+					"name": "Get All Cargos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8075/api/v1/cargo/getAllCargos?page=1&countItems=20",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8075",
+							"path": [
+								"api",
+								"v1",
+								"cargo",
+								"getAllCargos"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "countItems",
+									"value": "20"
+								},
+								{
+									"key": "sortBy",
+									"value": "count_down",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Save cargo",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\" : \"1\",\r\n    \"price\" : \"1\",\r\n    \"count\" : \"1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8075/api/v1/cargo/save",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8075",
+							"path": [
+								"api",
+								"v1",
+								"cargo",
+								"save"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Cargo",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8075/api/v1/cargo/delete/15",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8075",
+							"path": [
+								"api",
+								"v1",
+								"cargo",
+								"delete",
+								"15"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Cargos Name",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8075/api/v1/cargo/getCargosName",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8075",
+							"path": [
+								"api",
+								"v1",
+								"cargo",
+								"getCargosName"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Cargos By Name",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8075/api/v1/cargo/getCargosByName",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8075",
+							"path": [
+								"api",
+								"v1",
+								"cargo",
+								"getCargosByName"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "Стол",
+									"disabled": true
+								},
+								{
+									"key": "countItems",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "1",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Cargo",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8075/api/v1/cargo/searchCargo?priceFromParam=120&countItems=1&page=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8075",
+							"path": [
+								"api",
+								"v1",
+								"cargo",
+								"searchCargo"
+							],
+							"query": [
+								{
+									"key": "priceFromParam",
+									"value": "120"
+								},
+								{
+									"key": "priceToParam",
+									"value": "300",
+									"disabled": true
+								},
+								{
+									"key": "countFromParam",
+									"value": "50",
+									"disabled": true
+								},
+								{
+									"key": "countToParam",
+									"value": "50",
+									"disabled": true
+								},
+								{
+									"key": "countItems",
+									"value": "1"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Cargo",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": 19,\r\n    \"name\": 2,\r\n    \"price\": 3,\r\n    \"count\": 4\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8075/api/v1/cargo/update",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8075",
+							"path": [
+								"api",
+								"v1",
+								"cargo",
+								"update"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "API VK Get Cities",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://api.vk.com/method/database.getCities?access_token=vk1.a.iQ83sqUhtH8gMjOKDB8MfHUt4xFsLUdqmY4uymVfrV2sM9MHKtm0guGoGJktmK9BCmX8g0hgZ8U2K0etmR70_jsm5lL2S0uBIIBKj6XVbq6RKNQd7Xu3L5crCuryl1jSCXfXj78q_VfblwrpsNpySchjOpfxx07e5ilekrlw99AnRnE8ZTwFBRN4yyDlAMukp9CHzIvKea6t9FtrBUHV0g&v=5.131",
+					"protocol": "http",
+					"host": [
+						"api",
+						"vk",
+						"com"
+					],
+					"path": [
+						"method",
+						"database.getCities"
+					],
+					"query": [
+						{
+							"key": "access_token",
+							"value": "vk1.a.iQ83sqUhtH8gMjOKDB8MfHUt4xFsLUdqmY4uymVfrV2sM9MHKtm0guGoGJktmK9BCmX8g0hgZ8U2K0etmR70_jsm5lL2S0uBIIBKj6XVbq6RKNQd7Xu3L5crCuryl1jSCXfXj78q_VfblwrpsNpySchjOpfxx07e5ilekrlw99AnRnE8ZTwFBRN4yyDlAMukp9CHzIvKea6t9FtrBUHV0g"
+						},
+						{
+							"key": "country_id",
+							"value": "1",
+							"disabled": true
+						},
+						{
+							"key": "need_all",
+							"value": "1",
+							"disabled": true
+						},
+						{
+							"key": "count",
+							"value": "100",
+							"disabled": true
+						},
+						{
+							"key": "v",
+							"value": "5.131"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
