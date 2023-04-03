@@ -1,8 +1,6 @@
 package com.example.transportation.Controller;
 
-import com.example.transportation.DTO.OrderDTO_Update;
 import com.example.transportation.Model.Cargo;
-import com.example.transportation.Model.Order;
 import com.example.transportation.repository.CargoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -40,6 +38,7 @@ public class CargoController {
             end = (page * countItems);
 
             switch (sortBy) {
+                case "" -> cargos = cargoRepository.findAll(PageRequest.of(page - 1, (end - start)));
                 case "id_up" ->
                         cargos = cargoRepository.findAll(PageRequest.of(page - 1, (end - start),
                                 Sort.by(Sort.Direction.ASC, "id")));
@@ -64,7 +63,6 @@ public class CargoController {
                 case "count_down" ->
                         cargos = cargoRepository.findAll(PageRequest.of(page - 1, (end - start),
                                 Sort.by(Sort.Direction.DESC, "count")));
-                case "" -> cargos = cargoRepository.findAll(PageRequest.of(page - 1, (end - start)));
             }
         }
 
@@ -77,7 +75,6 @@ public class CargoController {
 
     @GetMapping("/getCargosName")
     public Set<String> getCargosName() {
-
         return cargoRepository.findAllDistinctNames();
     }
 
@@ -146,24 +143,19 @@ public class CargoController {
 
     @PostMapping("/save")
     public String saveDeliveryman(@RequestBody Cargo cargo) {
-
         long id = cargoRepository.save(cargo).getId();
-
         return String.valueOf(id);
     }
 
     @DeleteMapping("/delete/{id}")
     public boolean deleteDeliveryman(@PathVariable(value = "id") long id) {
-
         cargoRepository.deleteById(id);
-
         return cargoRepository.findById(id) == null;
     }
 
     @PostMapping("/update")
     public boolean updateCargo(@RequestBody Cargo cargo) {
         cargoRepository.save(cargo);
-
         return cargoRepository.findById(cargo.getId()) != null;
     }
 

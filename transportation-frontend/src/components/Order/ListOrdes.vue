@@ -133,7 +133,6 @@
           :disabled="x === '...'" class="btn btn-info mr-2">{{ x }}</button>
       </div>
     </div>
-    {{ sortBy }}
 
     <table class="table table-striped">
     

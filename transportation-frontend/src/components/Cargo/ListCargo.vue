@@ -123,9 +123,7 @@
             :disabled="page === '...'" class="btn btn-info mr-2">{{ page }}</button>
         </div>
       </div>
-
-      {{ idUpdate }}
-
+      
       <table class="table table-striped">
       <thead>
         <tr>

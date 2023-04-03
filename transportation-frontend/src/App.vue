@@ -34,8 +34,6 @@
     
     <div v-if="isShowDeliverymans">
       <ListDeliveryman/>
-      <hr>
-      <AddDeliveryman/>
     </div>
     <div v-if="isShowCargos">
       <ListCargo/>
@@ -48,7 +46,6 @@
 
 <script>
 import ListDeliveryman from './components/Deliveryman/ListDeliveryman.vue'
-import AddDeliveryman from './components/Deliveryman/AddDeliveryman.vue';
 
 import ListCargo from './components/Cargo/ListCargo.vue';
 
@@ -63,7 +60,6 @@ export default {
     ListDeliveryman,
     ListOrdes,
     ListCargo,
-    AddDeliveryman,
     BackToTop,
     DetailsOrder,
   },

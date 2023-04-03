@@ -76,12 +76,9 @@ export default {
                     count: this.count
                 }
 
-                console.log(cargo);
-
                 axios.post('http://localhost:8075/api/v1/cargo/save', cargo)
                 .then(response => {
                     this.idCreated = response.data;
-                    // передать данные обратно в AddOrder
                     this.$emit('cargoAdded', this.idCreated);
                 })
                 .catch(error => {

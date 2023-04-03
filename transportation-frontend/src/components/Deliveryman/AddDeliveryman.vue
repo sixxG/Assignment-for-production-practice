@@ -2,14 +2,9 @@
 
     <div style="display: block; margin: 0 auto; width: 70%; justify-content: center;">
     
-        <div class="alert alert-success" role="alert"
-            v-if="idCreated != null">
-            <p>Новый доставщик с ID: {{ idCreated }} был успешно добавлен</p>
-            <hr>
-            <p class="mb-0">Это сообщение автоматически пропадёт через 5 секунд.</p>
-        </div>
+        <button class="btn btn-success" v-on:click="isShowAddDeliveryman = !isShowAddDeliveryman">Создать Доставщика</button>
     
-        <form v-on:submit.prevent="saveDeliveryman">
+        <form v-if="isShowAddDeliveryman" v-on:submit.prevent="saveDeliveryman">
             <div class="form-row">
                 <div class="col-md-4 mb-3">
                     <label for="validationDefaultName">ФИО</label>
@@ -35,7 +30,7 @@
             </p>
     
             <div class="form-row">
-                <div class="col-md-1 mr-5">
+                <div class="col-md-14 mr-1">
                     <button class="btn btn-primary" type="submit">Submit form</button>
                 </div>
                 <div class="col-md-1 mb-3">
@@ -61,6 +56,7 @@
             vehicle: null,
             errors: [],
             idCreated: null,
+            isShowAddDeliveryman: false,
         }
         },
     
@@ -75,11 +71,10 @@
                     vehicle: this.vehicle
                 }
     
-                console.log(deliveryman);
-    
                 axios.post('http://localhost:8075/api/v1/deliveryman/save', deliveryman)
                 .then(response => {
                     this.idCreated = response.data;
+                    this.$emit('deliverymanAdded', this.idCreated);
                 })
                 .catch(error => {
                     console.error(error);

@@ -46,6 +46,7 @@ public class OrderController {
             end = (page * countItems);
 
             switch (sortBy) {
+                case "" -> orders = orderRepository.findAll(PageRequest.of(page - 1, (end - start)));
                 case "id_up" ->
                         orders = orderRepository.findAll(PageRequest.of(page - 1, (end - start), Sort.by(Sort.Direction.ASC, "id")));
                 case "id_down" ->
@@ -78,7 +79,6 @@ public class OrderController {
                         orders = orderRepository.findAll(PageRequest.of(page - 1, (end - start), Sort.by(Sort.Direction.ASC, "note")));
                 case "note_down" ->
                         orders = orderRepository.findAll(PageRequest.of(page - 1, (end - start), Sort.by(Sort.Direction.DESC, "note")));
-                case "" -> orders = orderRepository.findAll(PageRequest.of(page - 1, (end - start)));
             }
         }
 
@@ -186,13 +186,11 @@ public class OrderController {
     @DeleteMapping("/delete/{id}")
     public boolean deleteOrder(@PathVariable(value = "id") long id) {
         orderRepository.deleteById(id);
-
         return orderRepository.findById(id) == null;
     }
 
     @PostMapping("/complete/{id}")
     public boolean completeOrder(@PathVariable(value = "id") long id) {
-
         Order order = orderRepository.findById(id);
         order.setStatus(OrderStatus.DELIVERED.toString());
 
