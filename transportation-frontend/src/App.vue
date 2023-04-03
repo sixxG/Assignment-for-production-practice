@@ -39,8 +39,6 @@
     </div>
     <div v-if="isShowCargos">
       <ListCargo/>
-      <hr>
-      <AddCargo/>
     </div>
 
     <BackToTop />
@@ -53,7 +51,6 @@ import ListDeliveryman from './components/Deliveryman/ListDeliveryman.vue'
 import AddDeliveryman from './components/Deliveryman/AddDeliveryman.vue';
 
 import ListCargo from './components/Cargo/ListCargo.vue';
-import AddCargo from './components/Cargo/AddCargo.vue';
 
 import ListOrdes from './components/Order/ListOrdes.vue';
 import DetailsOrder from './components/Order/DetailsOrder.vue';
@@ -66,7 +63,6 @@ export default {
     ListDeliveryman,
     ListOrdes,
     ListCargo,
-    AddCargo,
     AddDeliveryman,
     BackToTop,
     DetailsOrder,
@@ -154,5 +150,19 @@ export default {
 </script>
 
 <style>
+  .page_selected {
+  width: 80px;
+  box-shadow:
+    inset 0 -3em 3em rgba(0,0,0,0.1),
+          0 0  0 2px rgb(255,255,255),
+          0.3em 0.3em 1em rgba(0,0,0,0.3);
+  }
 
+  th svg {
+    margin-left: 5px;
+  }
+
+  .sort_selected {
+    color: #00ff00;
+  }
 </style>

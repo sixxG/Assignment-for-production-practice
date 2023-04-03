@@ -104,26 +104,36 @@
           <input type="text" v-model="number" class="form-control" id="number" placeholder="1234">
         </div>
         <div class="form-group col-md-2">
-          <button v-on:click="clearFormSearch()" class="btn btn-success form-control" id="search" style="margin-top: 31px;">Сбросить</button>
+          <button v-on:click="findOrders(1)" class="btn btn-success form-control" id="search" style="margin-top: 31px;">Найти</button>
+        </div>
+        <div class="form-group col-md-2">
+          <button v-on:click="clearFormSearch()" class="btn btn-danger form-control" id="search" style="margin-top: 31px;">Сбросить</button>
         </div>
       </div>
     </div>
 
     <!-- Pagination -->
     <div class="form-row" style="width: 100%; display: block;">
-      <div class="col mb-3" v-if="orderStatus == null || orderStatus === 'All'">
+      <div class="col mb-3" v-if="orderStatus == null || orderStatus === 'All' && !ifSearch">
         <button v-for="x in pages()" v-bind:key="x" 
-          v-on:click="getOrders(x)"
+          v-on:click="getOrders(x, this.sortBy)"
           :class="{'page_selected': x == page}"
           :disabled="x === '...'" class="btn btn-info mr-2">{{ x }}</button>
       </div>
       <div class="col mb-3" v-if="orderStatus != null && orderStatus !== 'All'">
         <button v-for="x in pages()" v-bind:key="x" 
-          v-on:click="getOrdersByStatus(orderStatus, x)"
+          v-on:click="getOrdersByStatus(orderStatus, x, this.sortBy)"
+          :class="{'page_selected': x == page}"
+          :disabled="x === '...'" class="btn btn-info mr-2">{{ x }}</button>
+      </div>
+      <div class="col mb-3" v-if="ifSearch" id="ifSearch">
+        <button v-for="x in pages()" v-bind:key="x" 
+          v-on:click="findOrders(x, this.sortBy)"
           :class="{'page_selected': x == page}"
           :disabled="x === '...'" class="btn btn-info mr-2">{{ x }}</button>
       </div>
     </div>
+    {{ sortBy }}
 
     <table class="table table-striped">
     
@@ -136,13 +146,13 @@
             #
             <div style="display: flex; flex-direction: column;">
               <svg width="20" height="16" fill="currentColor"
-                v-on:click="ifSortById = !ifSortById"
-                :class="{'sort_selected': ifSortById}">
+                v-on:click="sortBy = 'id_up'"
+                :class="{'sort_selected': sortBy === 'id_up'}">
                 <path d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/>
               </svg>
               <svg width="20" height="16" fill="currentColor"
-                v-on:click="ifSortById = !ifSortById"
-                :class="{'sort_selected': !ifSortById}">>
+                v-on:click="sortBy = 'id_down'"
+                :class="{'sort_selected': sortBy === 'id_down'}">>
                 <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
               </svg>
             </div>
@@ -154,13 +164,13 @@
             Number
             <div style="display: flex; flex-direction: column;">
               <svg width="20" height="16" fill="currentColor"
-                v-on:click="ifSortByNumber = !ifSortByNumber"
-                :class="{'sort_selected': ifSortByNumber}">
+                v-on:click="sortBy = 'number_up'"
+                :class="{'sort_selected': sortBy === 'number_up'}">
                 <path d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/>
               </svg>
               <svg width="20" height="16" fill="currentColor"
-                v-on:click="ifSortByNumber = !ifSortByNumber"
-                :class="{'sort_selected': !ifSortByNumber}">>
+                v-on:click="sortBy = 'number_down'"
+                :class="{'sort_selected': sortBy === 'number_down'}">>
                 <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
               </svg>
             </div>
@@ -172,13 +182,13 @@
             From Location
             <div style="display: flex; flex-direction: column;">
               <svg width="20" height="16" fill="currentColor"
-                v-on:click="ifSortByFromLocation = !ifSortByFromLocation"
-                :class="{'sort_selected': ifSortByFromLocation}">
+                v-on:click="sortBy = 'fromLocation_up'"
+                :class="{'sort_selected': sortBy === 'fromLocation_up'}">
                 <path d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/>
               </svg>
               <svg width="20" height="16" fill="currentColor"
-                v-on:click="ifSortByFromLocation = !ifSortByFromLocation"
-                :class="{'sort_selected': !ifSortByFromLocation}">>
+                v-on:click="sortBy = 'fromLocation_down'"
+                :class="{'sort_selected': sortBy === 'fromLocation_down'}">>
                 <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
               </svg>
             </div>
@@ -190,13 +200,13 @@
             To Location
             <div style="display: flex; flex-direction: column;">
               <svg width="20" height="16" fill="currentColor"
-                v-on:click="ifSortByToLocation = !ifSortByToLocation"
-                :class="{'sort_selected': ifSortByToLocation}">
+                v-on:click="sortBy = 'toLocation_up'"
+                :class="{'sort_selected': sortBy === 'toLocation_up'}">
                 <path d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/>
               </svg>
               <svg width="20" height="16" fill="currentColor"
-                v-on:click="ifSortByToLocation = !ifSortByToLocation"
-                :class="{'sort_selected': !ifSortByToLocation}">>
+                v-on:click="sortBy = 'toLocation_down'"
+                :class="{'sort_selected': sortBy === 'toLocation_down'}">>
                 <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
               </svg>
             </div>
@@ -208,13 +218,13 @@
             Status
             <div style="display: flex; flex-direction: column;">
               <svg width="20" height="16" fill="currentColor"
-                v-on:click="ifSortByStatus = !ifSortByStatus"
-                :class="{'sort_selected': ifSortByStatus}">
+                v-on:click="sortBy = 'status_up'"
+                :class="{'sort_selected': sortBy === 'status_up'}">
                 <path d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/>
               </svg>
               <svg width="20" height="16" fill="currentColor"
-                v-on:click="ifSortByStatus = !ifSortByStatus"
-                :class="{'sort_selected': !ifSortByStatus}">>
+                v-on:click="sortBy = 'status_down'"
+                :class="{'sort_selected': sortBy === 'status_down'}">>
                 <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
               </svg>
             </div>
@@ -226,13 +236,13 @@
             Cargos
             <div style="display: flex; flex-direction: column;">
               <svg width="20" height="16" fill="currentColor"
-                v-on:click="ifSortByCargos = !ifSortByCargos"
-                :class="{'sort_selected': ifSortByCargos}">
+                v-on:click="sortBy = 'cargos_up'"
+                :class="{'sort_selected': sortBy === 'cargos_up'}">
                 <path d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/>
               </svg>
               <svg width="20" height="16" fill="currentColor"
-                v-on:click="ifSortByCargos = !ifSortByCargos"
-                :class="{'sort_selected': !ifSortByCargos}">>
+                v-on:click="sortBy = 'cargos_down'"
+                :class="{'sort_selected': sortBy === 'cargos_down'}">>
                 <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
               </svg>
             </div>
@@ -244,13 +254,13 @@
             Deliveryman
             <div style="display: flex; flex-direction: column;">
               <svg width="20" height="16" fill="currentColor"
-                v-on:click="ifSortByDeliveryMan = !ifSortByDeliveryMan"
-                :class="{'sort_selected': ifSortByDeliveryMan}">
+                v-on:click="sortBy = 'deliveryman_up'"
+                :class="{'sort_selected': sortBy === 'deliveryman_up'}">
                 <path d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/>
               </svg>
               <svg width="20" height="16" fill="currentColor"
-                v-on:click="ifSortByDeliveryMan = !ifSortByDeliveryMan"
-                :class="{'sort_selected': !ifSortByDeliveryMan}">>
+                v-on:click="sortBy = 'deliveryman_down'"
+                :class="{'sort_selected': sortBy === 'deliveryman_down'}">>
                 <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
               </svg>
             </div>
@@ -262,13 +272,13 @@
             Note
             <div style="display: flex; flex-direction: column;">
               <svg width="20" height="16" fill="currentColor"
-                v-on:click="ifSortByNote = !ifSortByNote"
-                :class="{'sort_selected': ifSortByNote}">
+                v-on:click="sortBy = 'note_up'"
+                :class="{'sort_selected': sortBy === 'note_up'}">
                 <path d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/>
               </svg>
               <svg width="20" height="16" fill="currentColor"
-                v-on:click="ifSortByNote = !ifSortByNote"
-                :class="{'sort_selected': !ifSortByNote}">>
+                v-on:click="sortBy = 'note_down'"
+                :class="{'sort_selected': sortBy === 'note_down'}">>
                 <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
               </svg>
             </div>
@@ -360,10 +370,8 @@ export default {
       countItem: 5,
       countPage: 1,
       page: 1,
-      // countOrders: null,
 
       AllOrdersList: [],
-      // filteredOrdersList: [],
 
       isDeleted: false,
       isCompleted: false,
@@ -379,6 +387,9 @@ export default {
       number: null,
       idUpdate: null,
 
+      sortBy: null,
+
+      ifSearch: false,
       ifSortById: false,
       ifSortByNumber: false,
       ifSortByFromLocation: false,
@@ -395,56 +406,6 @@ export default {
     gotoOrderDetails(id) {
       this.$emit('gotoOrderDetails', id);
     },
-
-    // filteredOrders() {
-    //   this.countPage = Math.ceil(this.countOrders / this.countItem);
-
-    //   // const start = (this.page - 1) * this.countItem;
-    //   // const end = this.page * this.countItem;
-      
-    //   // this.getAllOrders(this.page);
-
-    //   this.filteredOrdersList = this.AllOrdersList;
-
-    //   if (this.orderStatus && this.orderStatus != "All") {
-    //     const length = this.filteredOrdersList.length; 
-    //     this.countPage = Math.round(length / this.countItem);
-    //   }
-    //   if (this.fromLocation) {
-    //     this.filteredOrdersList = this.filteredOrdersList.filter(order => order.fromLocation.includes(this.fromLocation));
-    //     const length = this.filteredOrdersList.length; 
-    //     this.countPage = Math.round(length / this.countItem);
-    //   }
-    //   if (this.toLocation) {
-    //     this.filteredOrdersList = this.filteredOrdersList.filter(order => order.toLocation.includes(this.toLocation));
-    //     const length = this.filteredOrdersList.length; 
-    //     this.countPage = Math.round(length / this.countItem);
-    //   }
-    //   if (this.deliveryman) {
-    //     this.filteredOrdersList = this.filteredOrdersList.filter(order => order.deliveryman.fio.toString().includes(this.deliveryman));
-    //     const length = this.filteredOrdersList.length; 
-    //     this.countPage = Math.round(length / this.countItem);
-    //   }
-    //   if (this.cargo) {
-    //     this.filteredOrdersList = this.filteredOrdersList.filter(order =>
-    //       order.cargos.some(cargo => cargo.name.includes(this.cargo))
-    //     );
-    //     const length = this.filteredOrdersList.length; 
-    //     this.countPage = Math.round(length / this.countItem);
-    //   }
-    //   if (this.note) {
-    //     this.filteredOrdersList = this.filteredOrdersList.filter(order => order.note.includes(this.note));
-    //     const length = this.filteredOrdersList.length; 
-    //     this.countPage = Math.round(length / this.countItem);
-    //   }
-    //   if (this.number) {
-    //     this.filteredOrdersList = this.filteredOrdersList.filter(order => order.number.toString().includes(this.number.toString()));
-    //     const length = this.filteredOrdersList.length; 
-    //     this.countPage = Math.round(length / this.countItem);
-    //   }
-    //   return this.filteredOrdersList;
-    //   //.slice(start, end);
-    // },
 
     pages() {
       let left = Math.max(1, this.page - 2);
@@ -470,20 +431,23 @@ export default {
     },
 
     clearFormSearch() {
-      this.fromLocation = null,
-      this.toLocation = null,
-      this.deliveryman = null,
-      this.note = null,
-      this.cargo = null,
-      this.number = null
+      this.fromLocation = "",
+      this.toLocation = "",
+      this.deliveryman = "",
+      this.note = "",
+      this.cargo = "",
+      this.number = "",
+      this.ifSearch = false,
+      this.getOrders(1);
     },
 
-    getOrders(x) {
+    getOrders(x, sortBy) {
       axios
       .get('http://localhost:8075/api/v1/order/getAllOrders',  {
         params: {
           page: x,
           countItems: this.countItem,
+          sortBy: sortBy,
         }
       })
       .then((response) => {
@@ -519,6 +483,31 @@ export default {
           this.page = x;
           this.AllOrdersList = response.data;
           this.getCountOrders(status);
+      })
+    },
+
+    findOrders(x) {
+      axios
+      .get('http://localhost:8075/api/v1/order/searchOrder',  {
+        params: {
+          number: this.number,
+          fromLocation: this.fromLocation,
+          toLocation: this.toLocation,
+          status: this.orderStatus,
+          note: this.note,
+          deliveryman: this.deliveryman,
+          cargo: this.cargo,
+          countItems: this.countItem,
+          page: x,
+        }
+      })
+      .then((response) => {
+          this.page = x;
+          this.AllOrdersList = response.data.orders;
+          this.countOrders = response.data.count;
+          this.countPage = Math.ceil(this.countOrders / this.countItem);
+
+          this.ifSearch = true;
       })
     },
 
@@ -563,94 +552,6 @@ export default {
       }, 5000);
     },
 
-    // sortById() {
-    //   if (this.ifSortById) {
-    //     this.AllOrdersList.sort((a, b) => b.id - a.id);
-    //     this.filteredOrdersList.sort((a, b) => b.id - a.id);
-    //   } else {
-    //     this.AllOrdersList.sort((a, b) => a.id - b.id);
-    //     this.filteredOrdersList.sort((a, b) => a.id - b.id);
-    //   }
-    //   this.page = 1;
-    // },
-
-    // sortByNumber() {
-    //   if (this.ifSortByNumber) {
-    //     this.AllOrdersList.sort((a, b) => a.number - b.number);
-    //     this.filteredOrdersList.sort((a, b) => a.number - b.number);
-    //   } else {
-    //     this.AllOrdersList.sort((a, b) => b.number - a.number);
-    //     this.filteredOrdersList.sort((a, b) => b.number - a.number);
-    //   }
-    //   this.page = 1;
-    // },
-
-    // sortByFromLocation() {
-    //   if (this.ifSortByFromLocation) {
-    //     this.AllOrdersList.sort((a, b) => a.fromLocation.localeCompare(b.fromLocation));
-    //     this.filteredOrdersList.sort((a, b) => a.fromLocation.localeCompare(b.fromLocation));
-    //   } else {
-    //     this.AllOrdersList.sort((a, b) => b.fromLocation.localeCompare(a.fromLocation));
-    //     this.filteredOrdersList.sort((a, b) => b.fromLocation.localeCompare(a.fromLocation));
-    //   }
-    //   this.page = 1;
-    // },
-
-    // sortByToLocation() {
-    //   if (this.ifSortByToLocation) {
-    //     this.AllOrdersList.sort((a, b) => a.toLocation.localeCompare(b.toLocation));
-    //     this.filteredOrdersList.sort((a, b) => a.toLocation.localeCompare(b.toLocation));
-    //   } else {
-    //     this.AllOrdersList.sort((a, b) => b.toLocation.localeCompare(a.toLocation));
-    //     this.filteredOrdersList.sort((a, b) => b.toLocation.localeCompare(a.toLocation));
-    //   }
-    //   this.page = 1;
-    // },
-
-    // sortByStatus() {
-    //   if (this.ifSortByStatus) { 
-    //     this.AllOrdersList.sort((a, b) => a.status.localeCompare(b.status));
-    //     this.filteredOrdersList.sort((a, b) => a.status.localeCompare(b.status)); 
-    //   } else {
-    //     this.AllOrdersList.sort((a, b) => b.status.localeCompare(a.status));
-    //     this.filteredOrdersList.sort((a, b) => b.status.localeCompare(a.status));
-    //   }
-    //   this.page = 1;
-    // },
-
-    // sortByCargos() {
-    //   if (this.ifSortByCargos) { 
-    //     this.AllOrdersList.sort((a, b) => a.cargos.length - b.cargos.length);
-    //     this.filteredOrdersList.sort((a, b) => a.cargos.length - b.cargos.length);
-    //   } else {
-    //     this.AllOrdersList.sort((a, b) => b.cargos.length - a.cargos.length);
-    //     this.filteredOrdersList.sort((a, b) => b.cargos.length - a.cargos.length);
-    //   }
-    //   this.page = 1;
-    // },
-
-    // sortByDeliveryMan() {
-    //   if (this.ifSortByDeliveryMan) { 
-    //     this.AllOrdersList.sort((a, b) => a.deliveryman.fio.localeCompare(b.deliveryman.fio));
-    //     this.filteredOrdersList.sort((a, b) => a.deliveryman.fio.localeCompare(b.deliveryman.fio));
-    //   } else {
-    //     this.AllOrdersList.sort((a, b) => b.deliveryman.fio.localeCompare(a.deliveryman.fio));
-    //     this.filteredOrdersList.sort((a, b) => b.deliveryman.fio.localeCompare(a.deliveryman.fio));
-    //   }
-    //   this.page = 1;
-    // },
-
-    // sortByNote() {
-    //   if (this.ifSortByNote) {  
-    //     this.AllOrdersList.sort((a, b) => a.note.localeCompare(b.note));
-    //     this.filteredOrdersList.sort((a, b) => a.note.localeCompare(b.note));
-    //   } else {
-    //     this.AllOrdersList.sort((a, b) => b.note.localeCompare(a.note));
-    //     this.filteredOrdersList.sort((a, b) => b.note.localeCompare(a.note));
-    //   }
-    //   this.page = 1;
-    // },
-
     orderStatusWithoutSelected(statusWithout) {
         const statuses = ["Создан", "Комплектуется", "Готов к отправке", "Отправлен", "Доставлен"];
 
@@ -658,7 +559,7 @@ export default {
     },
   },
 
-  created() {
+  async created() {
     const windowData = Object.fromEntries(
       new URL(window.location).searchParams.entries()
     );
@@ -669,11 +570,17 @@ export default {
 
     this.orderStatus = localStorage.getItem('orderStatus');
 
+    this.sortBy = localStorage.getItem('sortBy');
+
     if (localStorage.getItem('countItem') !== null) {
       this.countItem = localStorage.getItem('countItem');
     }
 
-    this.getOrders(this.page);
+    if (this.ifSearch) {
+      await this.findOrders(this.page, this.sortBy);
+    } else {
+      await this.getOrders(this.page, this.sortBy);
+    }
   },
 
    watch: {
@@ -682,6 +589,17 @@ export default {
         null,
         document.title, 
         `${window.location.pathname}?page=${this.page}`);
+    },
+
+    sortBy() {
+      if (!this.ifSearch && this.orderStatus === "All" || this.orderStatus === null) {
+        this.getOrders(1, this.sortBy);
+      } else if (this.ifSearch) {
+        this.findOrders(1, this.sortBy);
+      } else {
+        this.getOrdersByStatus(this.orderStatus, this.page, this.sortBy)
+      }
+      localStorage.setItem('sortBy', this.sortBy);
     },
 
     orderStatus() {
@@ -694,65 +612,24 @@ export default {
     },
 
     countItem() {
-      if (this.orderStatus === "All" || this.orderStatus === null) {
+      if (!this.ifSearch && this.orderStatus === "All" || this.orderStatus === null) {
         this.getOrders(1);
+      } else if (this.ifSearch) {
+        this.findOrders(1);
       } else {
         this.getOrdersByStatus(this.orderStatus, this.page)
       }
       localStorage.setItem('countItem', this.countItem);
     },
 
-  //   ifSortById() {
-  //     this.sortById();
-  //   },
-
-  //   ifSortByNumber() {
-  //     this.sortByNumber();
-  //   },
-
-  //   ifSortByFromLocation() {
-  //     this.sortByFromLocation();
-  //   },
-    
-  //   ifSortByToLocation() {
-  //     this.sortByToLocation();
-  //   },
-
-  //   ifSortByStatus() {
-  //     this.sortByStatus();
-  //   },
-
-  //   ifSortByCargos() {
-  //     this.sortByCargos();
-  //   },
-
-  //   ifSortByDeliveryMan() {
-  //     this.sortByDeliveryMan();
-  //   },
-
-  //   ifSortByNote() { 
-  //     this.sortByNote();
-  //   }
+    ifSearch() {
+      localStorage.setItem('ifSearch', this.ifSearch);
+    }
   }
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
-  .page_selected {
-    width: 80px;
-    box-shadow:
-      inset 0 -3em 3em rgba(0,0,0,0.1),
-            0 0  0 2px rgb(255,255,255),
-            0.3em 0.3em 1em rgba(0,0,0,0.3);
-  }
 
-  th svg {
-    margin-left: 5px;
-  }
-
-  .sort_selected {
-    color: #00ff00;
-  }
 </style>
   

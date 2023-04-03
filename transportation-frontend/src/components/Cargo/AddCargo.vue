@@ -2,14 +2,9 @@
 
 <div style="display: block; margin: 0 auto; width: 70%; justify-content: center;">
 
-    <div class="alert alert-success" role="alert"
-        v-if="idCreated != null">
-        <p>Новый товар с ID: {{ idCreated }} был успешно добавлен</p>
-        <hr>
-        <p class="mb-0">Это сообщение автоматически пропадёт через 5 секунд.</p>
-    </div>
+    <button class="btn btn-success" v-on:click="isShowAddCargo = !isShowAddCargo">Создать товар</button>
 
-    <form v-on:submit.prevent="saveOrder">
+    <form v-if="isShowAddCargo" v-on:submit.prevent="saveOrder">
         <div class="form-row">
             <div class="col-md-4 mb-3">
                 <label for="validationDefaultName">Наименование</label>
@@ -65,17 +60,12 @@ export default {
             price: null,
             count: null,
             errors: [],
-            cargos: [],
             idCreated: null,
+            isShowAddCargo: false,
         }
     },
 
     methods: {
-        async getAllCargo() {
-            const response=await axios
-            .get('http://localhost:8075/api/v1/cargo/getAllCargos')
-            this.cargos=response.data
-        },
 
         async saveOrder() {
 
@@ -98,8 +88,6 @@ export default {
                     console.error(error);
                 });
 
-                await this.getAllCargo();
-
                 setTimeout(() => {
                     this.idCreated = null;
                 }, 5000);
@@ -115,10 +103,6 @@ export default {
         }
 
     },
-
-    beforeMount() {
-        this.getAllCargo()
-    }
 
 }
 </script>

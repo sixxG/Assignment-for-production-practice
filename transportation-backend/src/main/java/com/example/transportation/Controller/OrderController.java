@@ -11,12 +11,10 @@ import com.example.transportation.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -33,6 +31,7 @@ public class OrderController {
 
     @GetMapping("/getAllOrders")
     public List<Order> getAllOrder(@RequestParam(required = false, defaultValue = "5") int countItems,
+                                   @RequestParam(required = false, defaultValue = "") String sortBy,
                                    @RequestParam int page) {
 
         long countRows = orderRepository.count();
@@ -46,7 +45,41 @@ public class OrderController {
             start = ((page - 1) * countItems);
             end = (page * countItems);
 
-            orders = orderRepository.findAll(PageRequest.of(page - 1, (end - start)));
+            switch (sortBy) {
+                case "id_up" ->
+                        orders = orderRepository.findAll(PageRequest.of(page - 1, (end - start), Sort.by(Sort.Direction.ASC, "id")));
+                case "id_down" ->
+                        orders = orderRepository.findAll(PageRequest.of(page - 1, (end - start), Sort.by(Sort.Direction.DESC, "id")));
+                case "number_up" ->
+                        orders = orderRepository.findAll(PageRequest.of(page - 1, (end - start), Sort.by(Sort.Direction.ASC, "number")));
+                case "number_down" ->
+                        orders = orderRepository.findAll(PageRequest.of(page - 1, (end - start), Sort.by(Sort.Direction.DESC, "number")));
+                case "fromLocation_up" ->
+                        orders = orderRepository.findAll(PageRequest.of(page - 1, (end - start), Sort.by(Sort.Direction.ASC, "fromLocation")));
+                case "fromLocation_down" ->
+                        orders = orderRepository.findAll(PageRequest.of(page - 1, (end - start), Sort.by(Sort.Direction.DESC, "fromLocation")));
+                case "toLocation_up" ->
+                        orders = orderRepository.findAll(PageRequest.of(page - 1, (end - start), Sort.by(Sort.Direction.ASC, "toLocation")));
+                case "toLocation_down" ->
+                        orders = orderRepository.findAll(PageRequest.of(page - 1, (end - start), Sort.by(Sort.Direction.DESC, "toLocation")));
+                case "status_up" ->
+                        orders = orderRepository.findAll(PageRequest.of(page - 1, (end - start), Sort.by(Sort.Direction.ASC, "status")));
+                case "status_down" ->
+                        orders = orderRepository.findAll(PageRequest.of(page - 1, (end - start), Sort.by(Sort.Direction.DESC, "status")));
+                case "cargos_up" ->
+                        orders = orderRepository.findAllOrderByCargosCountDesc(PageRequest.of(page - 1, (end - start)));
+                case "cargos_down" ->
+                        orders = orderRepository.findAllOrderByCargosCountAsc(PageRequest.of(page - 1, (end - start)));
+                case "deliveryman_up" ->
+                        orders = orderRepository.findAll(PageRequest.of(page - 1, (end - start), Sort.by(Sort.Direction.ASC, "deliveryman")));
+                case "deliveryman_down" ->
+                        orders = orderRepository.findAll(PageRequest.of(page - 1, (end - start), Sort.by(Sort.Direction.DESC, "deliveryman")));
+                case "note_up" ->
+                        orders = orderRepository.findAll(PageRequest.of(page - 1, (end - start), Sort.by(Sort.Direction.ASC, "note")));
+                case "note_down" ->
+                        orders = orderRepository.findAll(PageRequest.of(page - 1, (end - start), Sort.by(Sort.Direction.DESC, "note")));
+                case "" -> orders = orderRepository.findAll(PageRequest.of(page - 1, (end - start)));
+            }
         }
 
         return orders.stream().toList();
@@ -60,7 +93,7 @@ public class OrderController {
         int end = countItems;
         List<Order> ordersByStatus = orderRepository.findAllByStatus(status, PageRequest.of(0, (end-start)));
 
-        long countRows = orderRepository.findAllByStatus(status).size();
+        long countRows = orderRepository.countByStatus(status);
         double countPage = Math.ceil(countRows / (float) countItems);
 
         if (page <= countPage) {
@@ -85,6 +118,48 @@ public class OrderController {
     @GetMapping("/getById/{id}")
     public Order getById(@PathVariable(value = "id") long id) {
         return orderRepository.findById(id);
+    }
+
+    @GetMapping("searchOrder")
+    public Map<String, Object> searchOrders(@RequestParam(required = false, defaultValue = "") String fromLocation,
+                                            @RequestParam(required = false, defaultValue = "") String toLocation,
+                                            @RequestParam(required = false, defaultValue = "") String deliveryman,
+                                            @RequestParam(required = false, defaultValue = "") String note,
+                                            @RequestParam(required = false, defaultValue = "") String cargo,
+                                            @RequestParam(required = false, defaultValue = "") String number,
+                                            @RequestParam(required = false, defaultValue = "") String status,
+                                            @RequestParam(required = false, defaultValue = "5") int countItems,
+                                            @RequestParam int page) {
+        if (status.equals("All")) status = "";
+
+        int start = 0;
+        int end = countItems;
+        List<Order> searchedOrders = orderRepository.findByAllFieldsContainingIgnoreCase(number, fromLocation,
+                toLocation, status,
+                note, deliveryman, cargo, PageRequest.of(0, Integer.MAX_VALUE));
+
+        long countRows = searchedOrders.size();
+        double countPage = Math.ceil(countRows / (float) countItems);
+
+        if (page <= countPage) {
+            start = ((page - 1) * countItems);
+            end = (page * countItems);
+            searchedOrders = orderRepository.findByAllFieldsContainingIgnoreCase(number, fromLocation,
+                    toLocation, status,
+                    note, deliveryman, cargo,
+                    PageRequest.of(page - 1, (end - start)));
+        } else {
+            searchedOrders = orderRepository.findByAllFieldsContainingIgnoreCase(number, fromLocation,
+                    toLocation, status,
+                    note, deliveryman, cargo,
+                    PageRequest.of(0, (end - start)));
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("orders", searchedOrders);
+        response.put("count", countRows);
+
+        return response;
     }
 
     @PostMapping("/save")
