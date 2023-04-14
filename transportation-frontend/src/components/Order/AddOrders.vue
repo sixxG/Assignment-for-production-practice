@@ -4,7 +4,7 @@
 
     <button class="btn btn-success" v-on:click="isShowAddOrder = !isShowAddOrder">Создать заказ</button>
 
-    <form v-if="isShowAddOrder" v-on:submit.prevent="saveOrder">
+    <form v-if="isShowAddOrder">
 
         <div class="form-row">
             <div class="col-md-4 mb-3">
@@ -30,7 +30,7 @@
                 <input type="text" list="Deliverymans" v-model="deliveryman" class="form-control" id="validationDefaultDeliveryman" placeholder="Доставщик" required>
                 
                 <datalist id="Deliverymans">
-                    <option v-for="deliveryman in deliverymans" v-bind:key="deliveryman.id"> {{ deliveryman.fio }}</option>
+                    <option v-for="deliveryman in deliverymans" v-bind:key="deliveryman"> {{ deliveryman }}</option>
                 </datalist>
             
             </div>
@@ -42,11 +42,7 @@
             </div>
         </div>
 
-        <!-- кнопка, которая открывает модальное окно AddCargo -->
-        <button type="button" class="btn btn-primary" v-on:click="isShowAddCargo = !isShowAddCargo">Добавить товар</button>
-
-        <!-- модальное окно для добавления товара -->
-        <AddCargo v-if="isShowAddCargo" @cargoAdded="onCargoAdded"></AddCargo>
+        <AddCargo @cargoAdded="onCargoAdded"></AddCargo>
 
         <div class="form-row">
             <div class="col-md-4 mb-3">
@@ -68,11 +64,7 @@
                             <td>{{ cargo.price }}</td>
                             <td>{{ cargo.count }}</td>
                             <td>
-                                <button type="button" class="btn btn-danger" v-on:click="deleteCargo(cargo.id)">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
-                                        <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47ZM8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5Z"/>
-                                    </svg>
-                                </button>
+                                <DeleteCargo :id="cargo.id" @cargoDeleted="onCargoDeleted(cargo.id)"></DeleteCargo>
                             </td>
                         </tr>
                     </tbody>
@@ -91,10 +83,10 @@
 
         <div class="form-row">
             <div class="col-md-1 mr-5">
-                <button class="btn btn-primary" type="submit">Submit form</button>
+                <button class="btn btn-primary" v-on:click="saveOrder($event)">Submit form</button>
             </div>
             <div class="col-md-1 mb-3">
-                <button class="btn btn-danger" type="reset">Clear form</button>
+                <button class="btn btn-danger" type="reset" v-on:click="resetForm">Clear form</button>
             </div>
         </div>
     </form>
@@ -105,11 +97,13 @@
 <script>
 import axios from "axios"
 import AddCargo from "../Cargo/AddCargo.vue"
+import DeleteCargo from "../Cargo/DeleteCargo.vue"
 
 export default {
     name: 'AddOrder',
     components: {
         AddCargo,
+        DeleteCargo,
     },
 
     data() {
@@ -123,39 +117,40 @@ export default {
             
             errors: [],
             deliverymans: [],
-            cargosListAll: [],
             cargosListToOrder: [],
-            isShowAddCargo: false,
             isShowAddOrder: false,
         }
     },
 
     methods: {
+
+        resetForm() {
+            this.errors = [];
+        },
         
-        getAllDeliverymans() {
+        getAllDeliverymansFIO() {
             axios
-                .get('http://localhost:8075/api/v1/deliveryman/getAllDeliverymans')
+                .get('http://localhost:8075/api/v1/deliveryman/getDeliverymansFIO')
                 .then((response) => {
                 this.deliverymans = response.data;
                 })
         },
 
-        async getAllCargo() {
+        async getAddedCargo(idCreated) {
             const response=await axios
-            .get('http://localhost:8075/api/v1/cargo/getAllCargos')
-            this.cargosListAll=response.data
+            .get('http://localhost:8075/api/v1/cargo/getById?id=' + idCreated);
+            this.cargosListToOrder.push(response.data);
         },
 
         async onCargoAdded(idCreated) {
-            await this.getAllCargo();
+            await this.getAddedCargo(idCreated);
                                 
             this.cargos = this.cargos + idCreated + " ";
 
-            this.cargosListToOrder.push(this.cargosListAll.find(item => item.id == idCreated));
             idCreated = null;
         },
 
-        deleteCargo(id) {
+        onCargoDeleted(id) {
             this.cargosListToOrder = this.cargosListToOrder.filter((e)=>e.id !== id )
             const arrId = this.cargos.split(" ");
 
@@ -164,17 +159,17 @@ export default {
             this.cargos = filteredArrId.join(" ");
         },
 
-        async saveOrder() {
-
+        saveOrder(event) {
+            event.preventDefault();
             if(this.number && this.fromLocation && this.toLocation
-                && this.cargos && this.deliveryman && this.note) {
+                && this.cargos != "" && this.deliveryman && this.note) {
 
                 const orderDTO = {
                     number: this.number,
                     fromLocation: this.fromLocation,
                     toLocation: this.toLocation,
                     cargos: this.cargos,
-                    deliveryman: this.deliverymans.find(item => item.fio === this.deliveryman).id,
+                    deliveryman: this.deliveryman,
                     note: this.note,
                 }
     
@@ -183,6 +178,7 @@ export default {
                     this.$emit('orderCreated', response.data);
                 })
                 .catch(error => {
+                    this.$emit('orderCreated', -1);
                     console.error(error);
                 });
     
@@ -196,15 +192,13 @@ export default {
 
                 this.errors = [],
                 this.deliverymans = [],
-                this.cargosListAl = [],
                 this.cargosListToOrder = [],
-                this.isShowAddCargo = false,
                 this.idCreated = null
             } else {
                 if(!this.number) this.errors.push("Number required.")
                 if(!this.fromLocation) this.errors.push("FromLocation required.")
                 if(!this.toLocation) this.errors.push("ToLocation required.")
-                if(!this.cargos) this.errors.push("Cargos required.")
+                if(this.cargos == "") this.errors.push("Cargos required.")
                 if(!this.deliveryman) this.errors.push("Deliveryman required.")
                 if(!this.note) this.errors.push("Note required.")
             }
@@ -213,7 +207,7 @@ export default {
     },
 
     beforeMount() {
-        this.getAllDeliverymans()
+        this.getAllDeliverymansFIO()
     }
 
 }

@@ -64,6 +64,8 @@
           <button v-on:click="morePointForSearch = !morePointForSearch" type="button" class="btn btn-info" style="margin-top: 31px;">
             Расширенный поиск
           </button>
+
+          <button v-on:click="clearFormSearch()" class="btn btn-danger form-control ml-3" id="search" style="margin-top: 31px; width: 130px;">Сбросить</button>
         </div>
       </div>
 
@@ -94,9 +96,6 @@
         <div class="form-row">
           <div class="form-group col-md-2">
             <button v-on:click="findCargos(1)" class="btn btn-success form-control" id="search">Найти</button>
-          </div>
-          <div class="form-group col-md-2">
-            <button v-on:click="clearFormSearch()" class="btn btn-danger form-control" id="search">Сбросить</button>
           </div>
         </div>
 
@@ -387,8 +386,11 @@
           this.priceTo = null;
           this.countFrom = null;
           this.countTo = null;
+          this.nameCargo = null;
+          this.sortBy = null;
 
           this.getCargos(1);
+          this.page = 1;
           this.ifSearch = false;
         } 
     

@@ -330,7 +330,7 @@ export default {
     },
 
     onDeliverymanAdded(id) {
-      this.getDeliverymans();
+      this.getDeliverymans(this.page);
 
       this.idCreated = id;
 
@@ -351,7 +351,7 @@ export default {
     },
 
     onDeliverymanDeleted(isDeliverymanDeleted) {
-      this.getDeliverymans();
+      this.getDeliverymans(this.page);
 
       this.isDeleted = isDeliverymanDeleted;
 

@@ -18,6 +18,11 @@
       <p class="mb-0">Это сообщение автоматически пропадёт через 5 секунд.</p>
     </div>
 
+    <div class="alert alert-danger" role="alert" v-if="isErrorCreated">
+      <p>Произошла ошибка при добавлении заказа! проверьте правильносте введёных данных!</p>
+      <p class="mb-0">Это сообщение автоматически пропадёт через 5 секунд.</p>
+    </div>
+
     <div class="form-row">
       <!-- Order Status -->
       <div class="col-md-4 mb-3">
@@ -375,6 +380,7 @@ export default {
       isDeleted: false,
       isCompleted: false,
       isUpdate: false,
+      isErrorCreated: false,
       idCreated: null,
 
       morePointForSearch: false,
@@ -513,11 +519,19 @@ export default {
     onOrderCreated(id) {
       this.getOrders(this.page);
 
-      this.idCreated = id;
+      if (id != -1) {
+        this.idCreated = id;
 
-      setTimeout(() => {
-          this.idCreated = null;
-      }, 5000);
+        setTimeout(() => {
+            this.idCreated = null;
+        }, 5000);
+      } else {
+        this.isErrorCreated = true;
+
+        setTimeout(() => {
+            this.isErrorCreated = false;
+        }, 5000);
+      }
     },
 
     onOrderDeleted(isOrderDeleted) {

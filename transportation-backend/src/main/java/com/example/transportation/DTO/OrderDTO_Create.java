@@ -8,6 +8,6 @@ public class OrderDTO_Create {
     private String fromLocation;
     private String toLocation;
     private String cargos;
-    private long deliveryman;
+    private String deliveryman;
     private String note;
 }

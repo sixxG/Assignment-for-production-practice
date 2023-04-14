@@ -33,6 +33,4 @@ public class Order {
     private Deliveryman deliveryman;
 
     private String note;
-
-
 }

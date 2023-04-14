@@ -2,9 +2,9 @@
 
 <div style="display: block; margin: 0 auto; width: 70%; justify-content: center;">
 
-    <button class="btn btn-success" v-on:click="isShowAddCargo = !isShowAddCargo">Создать товар</button>
+    <a class="btn btn-success" v-on:click="isShowAddCargo = !isShowAddCargo" style="color: white">Создать товар</a>
 
-    <form v-if="isShowAddCargo" v-on:submit.prevent="saveOrder">
+    <form v-if="isShowAddCargo">
         <div class="form-row">
             <div class="col-md-4 mb-3">
                 <label for="validationDefaultName">Наименование</label>
@@ -17,12 +17,12 @@
                 </div>
                 <div class="col-md-4 mb-3">
                 <label for="validationDefaultPrice">Цена</label>
-                <input type="number" v-model="price" class="form-control" id="validationDefaultPrice" placeholder="Цена" required step="any">
+                <input type="number" v-model="price" class="form-control" id="validationDefaultPrice" placeholder="Цена" onkeypress="return event.charCode >= 48" min="1" required step="any">
                 </div>
                 <div class="col-md-4 mb-3">
                 <label for="validationDefaultCount">Количество</label>
                 <div class="input-group">
-                    <input type="number" v-model="count" class="form-control" id="validationDefaultCount" placeholder="кол-во" required>
+                    <input type="number" v-model="count" class="form-control" id="validationDefaultCount" onkeypress="return event.charCode >= 48" min="1" placeholder="кол-во" required>
                 </div>
             </div>
         </div>
@@ -36,7 +36,7 @@
 
         <div class="form-row">
             <div class="col-md-14 mr-1">
-                <button class="btn btn-primary" type="submit">Submit form</button>
+                <a class="btn btn-primary" id="saveCargo" v-on:click="saveCargo">Submit form</a>
             </div>
             <div class="col-md-5 mb-3">
                 <button class="btn btn-danger" type="reset">Clear form</button>
@@ -67,7 +67,7 @@ export default {
 
     methods: {
 
-        async saveOrder() {
+        saveCargo() {
 
             if(this.name && this.price && this.count) {
                 const cargo = {
