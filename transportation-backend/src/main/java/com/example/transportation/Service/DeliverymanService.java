@@ -2,7 +2,6 @@ package com.example.transportation.Service;
 
 import com.example.transportation.Model.Deliveryman;
 import com.example.transportation.repository.DeliverymanRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -15,60 +14,45 @@ import java.util.Set;
 
 @Service
 public class DeliverymanService {
-    @Autowired
-    private DeliverymanRepository deliverymanRepository;
+    private final DeliverymanRepository deliverymanRepository;
 
-    public Map<String, Object> listDeliveryman(String sortBy, int countItems, int page) {
+    public DeliverymanService(DeliverymanRepository deliverymanRepository) {
+        this.deliverymanRepository = deliverymanRepository;
+    }
+
+    public Map<String, Object> getListDeliveryman(String sortBy, int countItemOnPage, int page) {
         long countRows = deliverymanRepository.count();
-        double countPage = Math.ceil(countRows / (float) countItems);
+        double countPage = Math.ceil(countRows / (float) countItemOnPage);
 
         int start = 0;
-        int end = countItems;
-        Page<Deliveryman> deliveryman = deliverymanRepository.findAll(PageRequest.of(0, (end-start)));
+        int end = countItemOnPage;
+        List<Deliveryman> deliverymans;
 
-        if (page <= countPage) {
-            start = ((page - 1) * countItems);
-            end = (page * countItems);
+        if (!sortBy.equals("")) {
+            deliverymans = sortDeliverymans(page, countPage, countItemOnPage, end, start, sortBy);
+        } else {
+            if (page <= countItemOnPage) {
+                start = ((page - 1) * countItemOnPage);
+                end = (page * countItemOnPage);
 
-            switch (sortBy) {
-                case "" -> deliveryman = deliverymanRepository.findAll(PageRequest.of(page - 1, (end - start)));
-                case "id_up" ->
-                        deliveryman = deliverymanRepository.findAll(PageRequest.of(page - 1, (end - start),
-                                Sort.by(Sort.Direction.ASC, "id")));
-                case "id_down" ->
-                        deliveryman = deliverymanRepository.findAll(PageRequest.of(page - 1, (end - start),
-                                Sort.by(Sort.Direction.DESC, "id")));
-                case "fio_up" ->
-                        deliveryman = deliverymanRepository.findAll(PageRequest.of(page - 1, (end - start),
-                                Sort.by(Sort.Direction.ASC, "fio")));
-                case "fio_down" ->
-                        deliveryman = deliverymanRepository.findAll(PageRequest.of(page - 1, (end - start),
-                                Sort.by(Sort.Direction.DESC, "fio")));
-                case "phone_up" ->
-                        deliveryman = deliverymanRepository.findAll(PageRequest.of(page - 1, (end - start),
-                                Sort.by(Sort.Direction.ASC, "phone")));
-                case "phone_down" ->
-                        deliveryman = deliverymanRepository.findAll(PageRequest.of(page - 1, (end - start),
-                                Sort.by(Sort.Direction.DESC, "phone")));
-                case "vehicle_up" ->
-                        deliveryman = deliverymanRepository.findAll(PageRequest.of(page - 1, (end - start),
-                                Sort.by(Sort.Direction.ASC, "vehicle")));
-                case "vehicle_down" ->
-                        deliveryman = deliverymanRepository.findAll(PageRequest.of(page - 1, (end - start),
-                                Sort.by(Sort.Direction.DESC, "vehicle")));
+                deliverymans = deliverymanRepository.findAll(PageRequest.of(page - 1, (end - start))).stream().toList();
+            } else {
+                deliverymans = deliverymanRepository.findAll(PageRequest.of(0, (end-start))).stream().toList();
             }
         }
 
         Map<String, Object> response = new HashMap<>();
-        response.put("deliverymans", deliveryman.stream().toList());
+        response.put("deliverymans", deliverymans);
         response.put("count", countRows);
 
         return response;
     }
-    public Set<String> getSetFIO() {
+
+    public Set<String> getSetFioDeliverymans() {
         return deliverymanRepository.findAllDistinctFIO();
     }
-    public Map<String, Object> getByFIO(String fio, int countItems, int page) {
+
+    public Map<String, Object> getDeliverymanByFIO(String fio, int countItems, int page) {
         Long countRows = deliverymanRepository.countByFioContaining(fio);
         double countPage = Math.ceil(countRows / (float) countItems);
 
@@ -89,7 +73,8 @@ public class DeliverymanService {
 
         return response;
     }
-    public Map<String, Object> search(String phone, String vehicle) {
+
+    public Map<String, Object> searchDeliverymans(String phone, String vehicle) {
         List<Deliveryman> searchedDeliveryman = deliverymanRepository.findByPhoneAndVehicleContainingIgnoreCase(phone, vehicle);
 
         long countRows = searchedDeliveryman.size();
@@ -100,15 +85,45 @@ public class DeliverymanService {
 
         return response;
     }
-    public String save(Deliveryman deliveryman) {
+
+    public String saveDeliveryman(Deliveryman deliveryman) {
         return String.valueOf(deliverymanRepository.save(deliveryman).getId());
     }
-    public boolean delete(long id) {
+
+    public boolean deleteDeliveryman(long id) {
         deliverymanRepository.deleteById(id);
         return deliverymanRepository.findById(id) == null;
     }
-    public String update(Deliveryman deliveryman) {
+
+    public String updateDeliveryman(Deliveryman deliveryman) {
         deliverymanRepository.save(deliveryman);
         return String.valueOf(deliverymanRepository.save(deliveryman));
     }
+
+    public List<Deliveryman> sortDeliverymans(int page, double countPage, int countItemOnPage,
+                                              int end, int start, String sortBy) {
+
+        String sortField = sortBy.split("_")[0];
+        String sortType = sortBy.split("_")[1];
+
+        Page<Deliveryman> deliverymans = deliverymanRepository.findAll(PageRequest.of(0, (end-start)));
+
+        if (page <= countPage) {
+            start = ((page - 1) * countItemOnPage);
+            end = (page * countItemOnPage);
+
+            if (sortType.equals("up")) {
+                deliverymans = deliverymanRepository
+                        .findAll(PageRequest
+                                .of(page - 1, (end - start), Sort.by(Sort.Direction.ASC, sortField)));
+            } else {
+                deliverymans = deliverymanRepository
+                        .findAll(PageRequest
+                                .of(page - 1, (end - start), Sort.by(Sort.Direction.DESC, sortField)));
+            }
+        }
+
+        return deliverymans.stream().toList();
+    }
+
 }

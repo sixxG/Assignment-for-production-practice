@@ -13,7 +13,9 @@ public interface CargoRepository extends JpaRepository<Cargo, Long> {
 
     @Query("SELECT DISTINCT c.name FROM Cargo c")
     Set<String> findAllDistinctNames();
+
     Long countByName(String name);
+
     List<Cargo> findByName(String name, PageRequest pageRequest);
 
     @Query("SELECT c FROM Cargo c WHERE (:priceFrom IS NULL OR c.price >= :priceFrom) " +

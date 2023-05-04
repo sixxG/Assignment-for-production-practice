@@ -2,73 +2,56 @@ package com.example.transportation.Service;
 
 import com.example.transportation.Model.Cargo;
 import com.example.transportation.repository.CargoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class CargoService {
-    @Autowired
-    private CargoRepository cargoRepository;
 
-    public Map<String, Object> listCargos(String sortBy, int countItems, int page) {
+    private final CargoRepository cargoRepository;
+
+    public CargoService(CargoRepository cargoRepository) {
+        this.cargoRepository = cargoRepository;
+    }
+
+    public Map<String, Object> getListCargos(String sortBy, int countItemOnPage, int page) {
         long countRows = cargoRepository.count();
-        double countPage = Math.ceil(countRows / (float) countItems);
+        double countPage = Math.ceil(countRows / (float) countItemOnPage);
 
         int start = 0;
-        int end = countItems;
-        Page<Cargo> cargos = cargoRepository.findAll(PageRequest.of(0, (end-start)));
+        int end = countItemOnPage;
 
-        if (page <= countPage) {
-            start = ((page - 1) * countItems);
-            end = (page * countItems);
+        List<Cargo> cargos;
 
-            switch (sortBy) {
-                case "" -> cargos = cargoRepository.findAll(PageRequest.of(page - 1, (end - start)));
-                case "id_up" ->
-                        cargos = cargoRepository.findAll(PageRequest.of(page - 1, (end - start),
-                                Sort.by(Sort.Direction.ASC, "id")));
-                case "id_down" ->
-                        cargos = cargoRepository.findAll(PageRequest.of(page - 1, (end - start),
-                                Sort.by(Sort.Direction.DESC, "id")));
-                case "name_up" ->
-                        cargos = cargoRepository.findAll(PageRequest.of(page - 1, (end - start),
-                                Sort.by(Sort.Direction.ASC, "name")));
-                case "name_down" ->
-                        cargos = cargoRepository.findAll(PageRequest.of(page - 1, (end - start),
-                                Sort.by(Sort.Direction.DESC, "name")));
-                case "price_up" ->
-                        cargos = cargoRepository.findAll(PageRequest.of(page - 1, (end - start),
-                                Sort.by(Sort.Direction.ASC, "price")));
-                case "price_down" ->
-                        cargos = cargoRepository.findAll(PageRequest.of(page - 1, (end - start),
-                                Sort.by(Sort.Direction.DESC, "price")));
-                case "count_up" ->
-                        cargos = cargoRepository.findAll(PageRequest.of(page - 1, (end - start),
-                                Sort.by(Sort.Direction.ASC, "count")));
-                case "count_down" ->
-                        cargos = cargoRepository.findAll(PageRequest.of(page - 1, (end - start),
-                                Sort.by(Sort.Direction.DESC, "count")));
+        if (!sortBy.equals("")) {
+            cargos = sortCargos(page, countPage, countItemOnPage, end, start, sortBy);
+        } else {
+            if (page <= countItemOnPage) {
+                start = ((page - 1) * countItemOnPage);
+                end = (page * countItemOnPage);
+
+                cargos = cargoRepository.findAll(PageRequest.of(page - 1, (end - start))).stream().toList();
+            } else {
+                cargos = cargoRepository.findAll(PageRequest.of(0, (end-start))).stream().toList();
             }
         }
 
         Map<String, Object> response = new HashMap<>();
-        response.put("cargos", cargos.stream().toList());
+        response.put("cargos", cargos);
         response.put("count", countRows);
 
         return response;
     }
-    public Set<String> getNames() {
+
+    public Set<String> getNamesCargos() {
         return cargoRepository.findAllDistinctNames();
     }
-    public Map<String, Object> getByName(String name, int countItems, int page) {
+
+    public Map<String, Object> getCargosByName(String name, int countItems, int page) {
         Long countRows = cargoRepository.countByName(name);
         double countPage = Math.ceil(countRows / (float) countItems);
 
@@ -89,11 +72,13 @@ public class CargoService {
 
         return response;
     }
-    public Cargo getById(long id) {
+
+    public Cargo getCargoById(long id) {
         return cargoRepository.findById(id);
     }
-    public Map<String, Object> search(String priceFromParam, String priceToParam, String countFromParam, String countToParam,
-                             int countItems, int page) {
+
+    public Map<String, Object> searchCargos(String priceFromParam, String priceToParam, String countFromParam,
+                                            String countToParam, int countItems, int page) {
         double priceFrom = priceFromParam.equals("") ? 0 : Double.parseDouble(priceFromParam);
         double priceTo = priceToParam.equals("") ? Double.MAX_VALUE : Double.parseDouble(priceToParam);
         int countFrom = countFromParam.equals("") ? 0 : Integer.parseInt(countFromParam);
@@ -101,8 +86,8 @@ public class CargoService {
 
         int start = 0;
         int end = countItems;
-        Set<Cargo> searchedCargos = cargoRepository.findByAllFields(priceFrom, priceTo,
-                countFrom, countTo, PageRequest.of(0, Integer.MAX_VALUE));
+        Set<Cargo> searchedCargos = cargoRepository.findByAllFields(priceFrom, priceTo, countFrom,
+                countTo, PageRequest.of(0, Integer.MAX_VALUE));
 
         long countRows = searchedCargos.size();
         double countPage = Math.ceil(countRows / (float) countItems);
@@ -123,15 +108,43 @@ public class CargoService {
 
         return response;
     }
-    public String save(Cargo cargo) {
+
+    public String saveCargo(Cargo cargo) {
         return String.valueOf(cargoRepository.save(cargo).getId());
     }
-    public boolean delete(long id) {
+
+    public boolean deleteCargo(long id) {
         cargoRepository.deleteById(id);
         return cargoRepository.findById(id) == null;
     }
-    public boolean update(Cargo cargo) {
+
+    public boolean updateCargo(Cargo cargo) {
         cargoRepository.save(cargo);
         return cargoRepository.findById(cargo.getId()) != null;
+    }
+
+    public List<Cargo> sortCargos(int page,double countPage, int countItemOnPage, int end, int start, String sortBy) {
+
+        String sortField = sortBy.split("_")[0];
+        String sortType = sortBy.split("_")[1];
+
+        Page<Cargo> cargos = cargoRepository.findAll(PageRequest.of(0, (end-start)));
+
+        if (page <= countPage) {
+            start = ((page - 1) * countItemOnPage);
+            end = (page * countItemOnPage);
+
+            if (sortType.equals("up")) {
+                cargos = cargoRepository
+                        .findAll(PageRequest
+                                .of(page - 1, (end - start), Sort.by(Sort.Direction.ASC, sortField)));
+            } else {
+                cargos = cargoRepository
+                        .findAll(PageRequest
+                                .of(page - 1, (end - start), Sort.by(Sort.Direction.DESC, sortField)));
+            }
+        }
+
+        return cargos.stream().toList();
     }
 }

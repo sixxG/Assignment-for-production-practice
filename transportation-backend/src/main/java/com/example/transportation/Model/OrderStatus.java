@@ -7,7 +7,7 @@ public enum OrderStatus {
     SHIPPED ("Отправлен"),
     DELIVERED ("Доставлен");
 
-    private String title;
+    private final String title;
     OrderStatus(String title) {
         this.title = title;
     }

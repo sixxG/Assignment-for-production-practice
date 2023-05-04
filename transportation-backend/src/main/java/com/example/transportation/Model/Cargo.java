@@ -16,10 +16,4 @@ public class Cargo {
     private int count;
 
     public Cargo() {}
-
-    public Cargo(String name, double price, int count) {
-        this.name = name;
-        this.price = price;
-        this.count = count;
-    }
 }

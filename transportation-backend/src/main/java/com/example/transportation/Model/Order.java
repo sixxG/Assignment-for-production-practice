@@ -10,7 +10,6 @@ import java.util.Set;
 @Data
 @Table(name = "orderTB")
 public class Order {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;

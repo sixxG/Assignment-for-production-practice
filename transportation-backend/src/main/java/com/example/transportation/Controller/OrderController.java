@@ -21,24 +21,24 @@ public class OrderController {
     public List<Order> getAllOrder(@RequestParam(required = false, defaultValue = "5") int countItems,
                                    @RequestParam(required = false, defaultValue = "") String sortBy,
                                    @RequestParam int page) {
-        return orderService.listOrder(sortBy, countItems, page);
+        return orderService.getListOrder(sortBy, countItems, page);
     }
 
     @GetMapping("/getOrdersByStatus")
     public List<Order> getOrdersByStatus(@RequestParam(required = false, defaultValue = "5") int countItems,
                                          @RequestParam String status,
                                          @RequestParam int page) {
-        return orderService.getByStatus(status, countItems, page);
+        return orderService.getOrdersByStatus(status, countItems, page);
     }
 
     @GetMapping("/getCountOrders")
     public long getCountOrders(@RequestParam(required = false, defaultValue = "") String status) {
-        return orderService.countOrders(status);
+        return orderService.getCountOrders(status);
     }
 
     @GetMapping("/getById/{id}")
     public Order getById(@PathVariable(value = "id") long id) {
-        return orderService.getById(id);
+        return orderService.getOrderById(id);
     }
 
     @GetMapping("searchOrder")
@@ -51,26 +51,26 @@ public class OrderController {
                                             @RequestParam(required = false, defaultValue = "") String status,
                                             @RequestParam(required = false, defaultValue = "5") int countItems,
                                             @RequestParam int page) {
-        return orderService.search(fromLocation, toLocation, deliveryman, note, cargo, number, status, countItems, page);
+        return orderService.searchOrder(fromLocation, toLocation, deliveryman, note, cargo, number, status, countItems, page);
     }
     @PostMapping("/complete/{id}")
     public boolean completeOrder(@PathVariable(value = "id") long id) {
-        return orderService.complete(id);
+        return orderService.completeOrder(id);
     }
 
     @PostMapping("/save")
     public String saveOrder(@RequestBody OrderDTO_Create orderDTO) {
-        return orderService.save(orderDTO);
+        return orderService.saveOrder(orderDTO);
     }
 
     @DeleteMapping("/delete/{id}")
     public boolean deleteOrder(@PathVariable(value = "id") long id) {
-        return orderService.delete(id);
+        return orderService.deleteOrder(id);
     }
 
     @PostMapping("/update")
     public boolean updateOrder(@RequestBody OrderDTO_Update orderDTO) {
-        return orderService.update(orderDTO);
+        return orderService.updateOrder(orderDTO);
     }
 
 }
